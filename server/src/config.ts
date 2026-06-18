@@ -35,6 +35,19 @@ export const DB_PATH =
   process.env.DB_PATH ?? path.join(__dirname, '..', 'data', 'thinkloop.db')
 export const DEFAULT_USER_ID = 'default'
 
+const isTurso = Boolean(process.env.TURSO_DATABASE_URL)
+
+export const DATABASE_URL =
+  process.env.TURSO_DATABASE_URL ??
+  process.env.DATABASE_URL ??
+  `file:${DB_PATH.replace(/\\/g, '/')}`
+
+export const DATABASE_AUTH_TOKEN = process.env.TURSO_AUTH_TOKEN ?? ''
+
+export function isRemoteDatabase(): boolean {
+  return isTurso || DATABASE_URL.startsWith('libsql://') || DATABASE_URL.startsWith('https://')
+}
+
 export const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY ?? ''
 export const OPENROUTER_MODEL =
   process.env.OPENROUTER_MODEL ?? 'openai/gpt-4o-mini'

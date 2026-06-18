@@ -1,25 +1,24 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import Database from 'better-sqlite3'
-import { drizzle } from 'drizzle-orm/better-sqlite3'
-import { DB_PATH } from '../config.js'
+import { createClient, type Client } from '@libsql/client'
+import { drizzle, type LibSQLDatabase } from 'drizzle-orm/libsql'
+import { DATABASE_AUTH_TOKEN, DATABASE_URL } from '../config.js'
 import * as schema from './schema.js'
 
-let sqlite: Database.Database | null = null
-let db: ReturnType<typeof drizzle> | null = null
+let client: Client | null = null
+let db: LibSQLDatabase<typeof schema> | null = null
+
+export function getClient() {
+  if (!client) {
+    client = createClient({
+      url: DATABASE_URL,
+      authToken: DATABASE_AUTH_TOKEN || undefined,
+    })
+  }
+  return client
+}
 
 export function getDb() {
   if (!db) {
-    fs.mkdirSync(path.dirname(DB_PATH), { recursive: true })
-    sqlite = new Database(DB_PATH)
-    sqlite.pragma('journal_mode = WAL')
-    sqlite.pragma('foreign_keys = ON')
-    db = drizzle(sqlite, { schema })
+    db = drizzle(getClient(), { schema })
   }
   return db
-}
-
-export function getSqlite() {
-  getDb()
-  return sqlite!
 }

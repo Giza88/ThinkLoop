@@ -1,45 +1,12 @@
-import cors from '@fastify/cors'
-import Fastify from 'fastify'
-import { PORT, getOrganizerMode } from './config.js'
+import { PORT } from './config.js'
 import { runMigrations } from './db/migrate.js'
 import { seedDatabase } from './db/seed.js'
-import { emailRoutes } from './routes/email.js'
-import { draftRoutes } from './routes/drafts.js'
-import { historyRoutes } from './routes/history.js'
-import { ideaRoutes } from './routes/ideas.js'
-import { integrationRoutes } from './routes/integrations.js'
-import { migrateRoutes } from './routes/migrate.js'
-import { searchRoutes } from './routes/search.js'
-import { settingsRoutes } from './routes/settings.js'
-import { workspaceRoutes } from './routes/workspace.js'
+import { buildApp } from './app.js'
 
-const app = Fastify({ logger: true })
+const app = await buildApp()
 
-await app.register(cors, { origin: true })
-
-app.get('/health', async () => ({
-  ok: true,
-  db: 'connected',
-  organizer: getOrganizerMode(),
-}))
-
-await app.register(
-  async (api) => {
-    await api.register(settingsRoutes)
-    await api.register(draftRoutes)
-    await api.register(historyRoutes)
-    await api.register(ideaRoutes)
-    await api.register(integrationRoutes)
-    await api.register(workspaceRoutes)
-    await api.register(emailRoutes)
-    await api.register(searchRoutes)
-    await api.register(migrateRoutes)
-  },
-  { prefix: '/api/v1' },
-)
-
-runMigrations()
-seedDatabase()
+await runMigrations()
+await seedDatabase()
 
 try {
   await app.listen({ port: PORT, host: '0.0.0.0' })

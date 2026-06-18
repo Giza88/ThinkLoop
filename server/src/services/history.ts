@@ -17,24 +17,26 @@ function rowToEntry(row: typeof historyEntries.$inferSelect): HistoryEntry {
   }
 }
 
-export function listHistory(limit = MAX_HISTORY, userId = DEFAULT_USER_ID): HistoryEntry[] {
+export async function listHistory(
+  limit = MAX_HISTORY,
+  userId = DEFAULT_USER_ID,
+): Promise<HistoryEntry[]> {
   const db = getDb()
-  return db
+  const rows = await db
     .select()
     .from(historyEntries)
     .where(eq(historyEntries.userId, userId))
     .orderBy(desc(historyEntries.timestamp))
     .limit(limit)
-    .all()
-    .map(rowToEntry)
+  return rows.map(rowToEntry)
 }
 
-export function addHistoryEntry(
+export async function addHistoryEntry(
   title: string,
   action: HistoryEntry['action'],
   entityId?: string | null,
   userId = DEFAULT_USER_ID,
-): HistoryEntry {
+): Promise<HistoryEntry> {
   const db = getDb()
   const entry = {
     id: randomUUID(),
@@ -44,51 +46,51 @@ export function addHistoryEntry(
     entityId: entityId ?? null,
     timestamp: new Date().toISOString(),
   }
-  db.insert(historyEntries).values(entry).run()
+  await db.insert(historyEntries).values(entry)
 
-  const all = db
+  const all = await db
     .select({ id: historyEntries.id })
     .from(historyEntries)
     .where(eq(historyEntries.userId, userId))
     .orderBy(desc(historyEntries.timestamp))
-    .all()
 
   if (all.length > MAX_HISTORY) {
     const toDelete = all.slice(MAX_HISTORY)
     for (const row of toDelete) {
-      db.delete(historyEntries).where(eq(historyEntries.id, row.id)).run()
+      await db.delete(historyEntries).where(eq(historyEntries.id, row.id))
     }
   }
 
   return rowToEntry(entry)
 }
 
-export function bulkImportHistory(items: HistoryEntry[], userId = DEFAULT_USER_ID) {
+export async function bulkImportHistory(items: HistoryEntry[], userId = DEFAULT_USER_ID) {
   const db = getDb()
   for (const item of items) {
-    const existing = db.select().from(historyEntries).where(eq(historyEntries.id, item.id)).get()
+    const [existing] = await db
+      .select()
+      .from(historyEntries)
+      .where(eq(historyEntries.id, item.id))
+      .limit(1)
     if (existing) continue
-    db.insert(historyEntries)
-      .values({
-        id: item.id,
-        userId,
-        title: item.title,
-        action: item.action,
-        entityId: item.entityId ?? null,
-        timestamp: item.timestamp,
-      })
-      .run()
+    await db.insert(historyEntries).values({
+      id: item.id,
+      userId,
+      title: item.title,
+      action: item.action,
+      entityId: item.entityId ?? null,
+      timestamp: item.timestamp,
+    })
   }
 }
 
-export function getDashboardStats(userId = DEFAULT_USER_ID) {
+export async function getDashboardStats(userId = DEFAULT_USER_ID) {
   const db = getDb()
-  const entries = db
+  const entries = await db
     .select()
     .from(historyEntries)
     .where(eq(historyEntries.userId, userId))
     .orderBy(desc(historyEntries.timestamp))
-    .all()
 
   const organized = entries.filter((e) => e.action === 'organized').length
   const approved = entries.filter((e) => e.action === 'approved').length

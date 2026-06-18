@@ -20,45 +20,45 @@ export function rowToDraft(row: typeof drafts.$inferSelect): Draft {
   }
 }
 
-export function listDrafts(userId = DEFAULT_USER_ID): Draft[] {
+export async function listDrafts(userId = DEFAULT_USER_ID): Promise<Draft[]> {
   const db = getDb()
-  return db
+  const rows = await db
     .select()
     .from(drafts)
     .where(eq(drafts.userId, userId))
     .orderBy(desc(drafts.updatedAt))
-    .all()
-    .map(rowToDraft)
+  return rows.map(rowToDraft)
 }
 
-export function getDraft(id: string, userId = DEFAULT_USER_ID): Draft | null {
+export async function getDraft(id: string, userId = DEFAULT_USER_ID): Promise<Draft | null> {
   const db = getDb()
-  const row = db
+  const [row] = await db
     .select()
     .from(drafts)
     .where(and(eq(drafts.id, id), eq(drafts.userId, userId)))
-    .get()
+    .limit(1)
   return row ? rowToDraft(row) : null
 }
 
-export function upsertDraftFromDocument(
+export async function upsertDraftFromDocument(
   doc: StructuredDocument,
   userId = DEFAULT_USER_ID,
-): Draft {
+): Promise<Draft> {
   const db = getDb()
   const now = new Date().toISOString()
   const preview = documentPreview(doc)
   const approvalStatus = doc.approvalStatus ?? 'approved'
   const documentJson = JSON.stringify(doc)
 
-  const existing = db
+  const [existing] = await db
     .select()
     .from(drafts)
     .where(and(eq(drafts.userId, userId), eq(drafts.title, doc.title)))
-    .get()
+    .limit(1)
 
   if (existing) {
-    db.update(drafts)
+    await db
+      .update(drafts)
       .set({
         preview,
         documentJson,
@@ -66,7 +66,6 @@ export function upsertDraftFromDocument(
         updatedAt: now,
       })
       .where(eq(drafts.id, existing.id))
-      .run()
     return rowToDraft({ ...existing, preview, documentJson, approvalStatus, updatedAt: now })
   }
 
@@ -81,14 +80,14 @@ export function upsertDraftFromDocument(
     createdAt: now,
     updatedAt: now,
   }
-  db.insert(drafts).values(row).run()
+  await db.insert(drafts).values(row)
   return rowToDraft(row)
 }
 
-export function createDraft(
+export async function createDraft(
   doc: StructuredDocument,
   userId = DEFAULT_USER_ID,
-): Draft {
+): Promise<Draft> {
   const db = getDb()
   const now = new Date().toISOString()
   const row = {
@@ -101,27 +100,28 @@ export function createDraft(
     createdAt: now,
     updatedAt: now,
   }
-  db.insert(drafts).values(row).run()
+  await db.insert(drafts).values(row)
   return rowToDraft(row)
 }
 
-export function updateDraft(
+export async function updateDraft(
   id: string,
   doc: StructuredDocument,
   userId = DEFAULT_USER_ID,
-): Draft | null {
+): Promise<Draft | null> {
   const db = getDb()
-  const existing = db
+  const [existing] = await db
     .select()
     .from(drafts)
     .where(and(eq(drafts.id, id), eq(drafts.userId, userId)))
-    .get()
+    .limit(1)
   if (!existing) return null
 
   const now = new Date().toISOString()
   const preview = documentPreview(doc)
   const documentJson = JSON.stringify(doc)
-  db.update(drafts)
+  await db
+    .update(drafts)
     .set({
       title: doc.title,
       preview,
@@ -130,7 +130,6 @@ export function updateDraft(
       updatedAt: now,
     })
     .where(eq(drafts.id, id))
-    .run()
 
   return rowToDraft({
     ...existing,
@@ -142,37 +141,35 @@ export function updateDraft(
   })
 }
 
-export function deleteDraft(id: string, userId = DEFAULT_USER_ID): boolean {
+export async function deleteDraft(id: string, userId = DEFAULT_USER_ID): Promise<boolean> {
   const db = getDb()
-  const result = db
+  const deleted = await db
     .delete(drafts)
     .where(and(eq(drafts.id, id), eq(drafts.userId, userId)))
-    .run()
-  return result.changes > 0
+    .returning({ id: drafts.id })
+  return deleted.length > 0
 }
 
-export function bulkImportDrafts(items: Draft[], userId = DEFAULT_USER_ID) {
+export async function bulkImportDrafts(items: Draft[], userId = DEFAULT_USER_ID) {
+  const db = getDb()
   for (const item of items) {
-    const db = getDb()
-    const existing = db.select().from(drafts).where(eq(drafts.id, item.id)).get()
+    const [existing] = await db.select().from(drafts).where(eq(drafts.id, item.id)).limit(1)
     if (existing) continue
-    db.insert(drafts)
-      .values({
-        id: item.id,
-        userId,
-        title: item.title,
-        preview: item.preview,
-        documentJson: JSON.stringify({
-          ...item.document,
-          generatedAt:
-            typeof item.document.generatedAt === 'string'
-              ? item.document.generatedAt
-              : new Date(item.document.generatedAt).toISOString(),
-        }),
-        approvalStatus: item.document.approvalStatus ?? 'approved',
-        createdAt: item.updatedAt,
-        updatedAt: item.updatedAt,
-      })
-      .run()
+    await db.insert(drafts).values({
+      id: item.id,
+      userId,
+      title: item.title,
+      preview: item.preview,
+      documentJson: JSON.stringify({
+        ...item.document,
+        generatedAt:
+          typeof item.document.generatedAt === 'string'
+            ? item.document.generatedAt
+            : new Date(item.document.generatedAt).toISOString(),
+      }),
+      approvalStatus: item.document.approvalStatus ?? 'approved',
+      createdAt: item.updatedAt,
+      updatedAt: item.updatedAt,
+    })
   }
 }

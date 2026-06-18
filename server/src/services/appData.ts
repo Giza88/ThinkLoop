@@ -21,9 +21,13 @@ import { upsertDraftFromDocument } from './drafts.js'
 import { addHistoryEntry } from './history.js'
 import { organizeThoughts } from './organize.js'
 
-export function getSettings(userId = DEFAULT_USER_ID): UserSettings {
+export async function getSettings(userId = DEFAULT_USER_ID): Promise<UserSettings> {
   const db = getDb()
-  const row = db.select().from(userSettings).where(eq(userSettings.userId, userId)).get()
+  const [row] = await db
+    .select()
+    .from(userSettings)
+    .where(eq(userSettings.userId, userId))
+    .limit(1)
   if (!row) {
     return {
       autoSaveDrafts: true,
@@ -42,14 +46,15 @@ export function getSettings(userId = DEFAULT_USER_ID): UserSettings {
   }
 }
 
-export function patchSettings(
+export async function patchSettings(
   patch: Partial<UserSettings>,
   userId = DEFAULT_USER_ID,
-): UserSettings {
+): Promise<UserSettings> {
   const db = getDb()
-  const current = getSettings(userId)
+  const current = await getSettings(userId)
   const next = { ...current, ...patch }
-  db.update(userSettings)
+  await db
+    .update(userSettings)
     .set({
       autoSaveDrafts: next.autoSaveDrafts,
       showPrompts: next.showPrompts,
@@ -58,17 +63,16 @@ export function patchSettings(
       sidebarCollapsed: next.sidebarCollapsed,
     })
     .where(eq(userSettings.userId, userId))
-    .run()
   return next
 }
 
-export function getWorkspace(userId = DEFAULT_USER_ID): WorkspaceSession {
+export async function getWorkspace(userId = DEFAULT_USER_ID): Promise<WorkspaceSession> {
   const db = getDb()
-  const row = db
+  const [row] = await db
     .select()
     .from(workspaceSessions)
     .where(eq(workspaceSessions.userId, userId))
-    .get()
+    .limit(1)
 
   if (!row) {
     return { thoughts: [], document: null, updatedAt: new Date().toISOString() }
@@ -83,11 +87,11 @@ export function getWorkspace(userId = DEFAULT_USER_ID): WorkspaceSession {
   }
 }
 
-export function saveWorkspace(
+export async function saveWorkspace(
   thoughts: Thought[],
   document: StructuredDocument | null,
   userId = DEFAULT_USER_ID,
-): WorkspaceSession {
+): Promise<WorkspaceSession> {
   const db = getDb()
   const now = new Date().toISOString()
   const values = {
@@ -97,23 +101,23 @@ export function saveWorkspace(
     updatedAt: now,
   }
 
-  const existing = db
+  const [existing] = await db
     .select()
     .from(workspaceSessions)
     .where(eq(workspaceSessions.userId, userId))
-    .get()
+    .limit(1)
 
   if (existing) {
-    db.update(workspaceSessions).set(values).where(eq(workspaceSessions.userId, userId)).run()
+    await db.update(workspaceSessions).set(values).where(eq(workspaceSessions.userId, userId))
   } else {
-    db.insert(workspaceSessions).values(values).run()
+    await db.insert(workspaceSessions).values(values)
   }
 
   return { thoughts, document, updatedAt: now }
 }
 
-export function addThought(text: string, userId = DEFAULT_USER_ID) {
-  const session = getWorkspace(userId)
+export async function addThought(text: string, userId = DEFAULT_USER_ID) {
+  const session = await getWorkspace(userId)
   const thought: Thought = {
     id: randomUUID(),
     text: text.trim(),
@@ -123,15 +127,15 @@ export function addThought(text: string, userId = DEFAULT_USER_ID) {
   return saveWorkspace(thoughts, session.document, userId)
 }
 
-export function removeThought(thoughtId: string, userId = DEFAULT_USER_ID) {
-  const session = getWorkspace(userId)
+export async function removeThought(thoughtId: string, userId = DEFAULT_USER_ID) {
+  const session = await getWorkspace(userId)
   const thoughts = session.thoughts.filter((t) => t.id !== thoughtId)
   return saveWorkspace(thoughts, session.document, userId)
 }
 
 export async function organizeWorkspace(userId = DEFAULT_USER_ID) {
-  const settings = getSettings(userId)
-  const session = getWorkspace(userId)
+  const settings = await getSettings(userId)
+  const session = await getWorkspace(userId)
   if (session.thoughts.length === 0) {
     throw new Error('No thoughts to organize')
   }
@@ -142,69 +146,68 @@ export async function organizeWorkspace(userId = DEFAULT_USER_ID) {
     approvalStatus: settings.requireApproval ? 'pending' : 'approved',
   }
 
-  saveWorkspace(session.thoughts, proposal, userId)
-  addHistoryEntry(doc.title, 'organized', null, userId)
+  await saveWorkspace(session.thoughts, proposal, userId)
+  await addHistoryEntry(doc.title, 'organized', null, userId)
 
   if (!settings.requireApproval && settings.autoSaveDrafts) {
-    upsertDraftFromDocument(proposal, userId)
-    addHistoryEntry(doc.title, 'saved', null, userId)
+    await upsertDraftFromDocument(proposal, userId)
+    await addHistoryEntry(doc.title, 'saved', null, userId)
   }
 
   return getWorkspace(userId)
 }
 
-export function approveWorkspace(userId = DEFAULT_USER_ID) {
-  const settings = getSettings(userId)
-  const session = getWorkspace(userId)
+export async function approveWorkspace(userId = DEFAULT_USER_ID) {
+  const settings = await getSettings(userId)
+  const session = await getWorkspace(userId)
   if (!session.document) throw new Error('No document to approve')
 
   const approved: StructuredDocument = {
     ...session.document,
     approvalStatus: 'approved',
   }
-  saveWorkspace(session.thoughts, approved, userId)
-  addHistoryEntry(approved.title, 'approved', null, userId)
+  await saveWorkspace(session.thoughts, approved, userId)
+  await addHistoryEntry(approved.title, 'approved', null, userId)
 
   if (settings.autoSaveDrafts) {
-    upsertDraftFromDocument(approved, userId)
-    addHistoryEntry(approved.title, 'saved', null, userId)
+    await upsertDraftFromDocument(approved, userId)
+    await addHistoryEntry(approved.title, 'saved', null, userId)
   }
 
   return getWorkspace(userId)
 }
 
-export function rejectWorkspace(userId = DEFAULT_USER_ID) {
-  const session = getWorkspace(userId)
+export async function rejectWorkspace(userId = DEFAULT_USER_ID) {
+  const session = await getWorkspace(userId)
   if (!session.document) throw new Error('No document to reject')
 
-  addHistoryEntry(session.document.title, 'rejected', null, userId)
+  await addHistoryEntry(session.document.title, 'rejected', null, userId)
   return saveWorkspace(session.thoughts, null, userId)
 }
 
-export function listIdeas(userId = DEFAULT_USER_ID): IdeaCard[] {
+export async function listIdeas(userId = DEFAULT_USER_ID): Promise<IdeaCard[]> {
   const db = getDb()
-  return db
+  const rows = await db
     .select()
     .from(ideas)
     .where(eq(ideas.userId, userId))
     .orderBy(desc(ideas.updatedAt))
-    .all()
-    .map((row) => ({
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      tags: JSON.parse(row.tagsJson) as string[],
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    }))
+  return rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    tags: JSON.parse(row.tagsJson) as string[],
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  }))
 }
 
-export function createIdea(
+export async function createIdea(
   title: string,
   description: string,
   tags: string[],
   userId = DEFAULT_USER_ID,
-): IdeaCard {
+): Promise<IdeaCard> {
   const db = getDb()
   const now = new Date().toISOString()
   const row = {
@@ -216,7 +219,7 @@ export function createIdea(
     createdAt: now,
     updatedAt: now,
   }
-  db.insert(ideas).values(row).run()
+  await db.insert(ideas).values(row)
   return {
     id: row.id,
     title,
@@ -227,17 +230,17 @@ export function createIdea(
   }
 }
 
-export function updateIdea(
+export async function updateIdea(
   id: string,
   data: Partial<Pick<IdeaCard, 'title' | 'description' | 'tags'>>,
   userId = DEFAULT_USER_ID,
-): IdeaCard | null {
+): Promise<IdeaCard | null> {
   const db = getDb()
-  const existing = db
+  const [existing] = await db
     .select()
     .from(ideas)
     .where(and(eq(ideas.id, id), eq(ideas.userId, userId)))
-    .get()
+    .limit(1)
   if (!existing) return null
 
   const now = new Date().toISOString()
@@ -245,10 +248,10 @@ export function updateIdea(
   const description = data.description ?? existing.description
   const tagsJson = JSON.stringify(data.tags ?? JSON.parse(existing.tagsJson))
 
-  db.update(ideas)
+  await db
+    .update(ideas)
     .set({ title, description, tagsJson, updatedAt: now })
     .where(eq(ideas.id, id))
-    .run()
 
   return {
     id,
@@ -260,120 +263,119 @@ export function updateIdea(
   }
 }
 
-export function deleteIdea(id: string, userId = DEFAULT_USER_ID): boolean {
+export async function deleteIdea(id: string, userId = DEFAULT_USER_ID): Promise<boolean> {
   const db = getDb()
-  const result = db
+  const deleted = await db
     .delete(ideas)
     .where(and(eq(ideas.id, id), eq(ideas.userId, userId)))
-    .run()
-  return result.changes > 0
+    .returning({ id: ideas.id })
+  return deleted.length > 0
 }
 
-export function listIntegrations(userId = DEFAULT_USER_ID): string[] {
+export async function listIntegrations(userId = DEFAULT_USER_ID): Promise<string[]> {
   const db = getDb()
-  return db
+  const rows = await db
     .select()
     .from(integrations)
     .where(eq(integrations.userId, userId))
-    .all()
-    .map((row) => row.providerId)
+  return rows.map((row) => row.providerId)
 }
 
-export function setIntegrations(providerIds: string[], userId = DEFAULT_USER_ID): string[] {
+export async function setIntegrations(
+  providerIds: string[],
+  userId = DEFAULT_USER_ID,
+): Promise<string[]> {
   const db = getDb()
   const now = new Date().toISOString()
-  db.delete(integrations).where(eq(integrations.userId, userId)).run()
+  await db.delete(integrations).where(eq(integrations.userId, userId))
   for (const providerId of providerIds) {
-    db.insert(integrations)
-      .values({ userId, providerId, connectedAt: now })
-      .run()
+    await db.insert(integrations).values({ userId, providerId, connectedAt: now })
   }
   return providerIds
 }
 
-export function connectIntegration(providerId: string, userId = DEFAULT_USER_ID): string[] {
-  const current = listIntegrations(userId)
+export async function connectIntegration(
+  providerId: string,
+  userId = DEFAULT_USER_ID,
+): Promise<string[]> {
+  const current = await listIntegrations(userId)
   if (current.includes(providerId)) return current
   const db = getDb()
-  db.insert(integrations)
-    .values({
-      userId,
-      providerId,
-      connectedAt: new Date().toISOString(),
-    })
-    .run()
+  await db.insert(integrations).values({
+    userId,
+    providerId,
+    connectedAt: new Date().toISOString(),
+  })
   return [...current, providerId]
 }
 
-export function disconnectIntegration(providerId: string, userId = DEFAULT_USER_ID): string[] {
+export async function disconnectIntegration(
+  providerId: string,
+  userId = DEFAULT_USER_ID,
+): Promise<string[]> {
   const db = getDb()
-  db.delete(integrations)
+  await db
+    .delete(integrations)
     .where(and(eq(integrations.userId, userId), eq(integrations.providerId, providerId)))
-    .run()
   return listIntegrations(userId)
 }
 
-export function bulkImportIntegrations(providerIds: string[], userId = DEFAULT_USER_ID) {
-  const current = new Set(listIntegrations(userId))
+export async function bulkImportIntegrations(providerIds: string[], userId = DEFAULT_USER_ID) {
+  const current = new Set(await listIntegrations(userId))
   for (const id of providerIds) {
-    if (!current.has(id)) connectIntegration(id, userId)
+    if (!current.has(id)) await connectIntegration(id, userId)
   }
 }
 
-export function searchAll(query: string, userId = DEFAULT_USER_ID) {
+export async function searchAll(query: string, userId = DEFAULT_USER_ID) {
   const db = getDb()
   const q = `%${query.trim()}%`
   if (!query.trim()) return []
 
-  const draftResults = db
+  const draftRows = await db
     .select()
     .from(drafts)
     .where(and(eq(drafts.userId, userId), or(like(drafts.title, q), like(drafts.preview, q))))
     .limit(10)
-    .all()
-    .map((row) => ({
-      type: 'draft' as const,
-      id: row.id,
-      title: row.title,
-      section: 'Drafts',
-    }))
 
-  const ideaResults = db
+  const ideaRows = await db
     .select()
     .from(ideas)
     .where(
-      and(
-        eq(ideas.userId, userId),
-        or(like(ideas.title, q), like(ideas.description, q)),
-      ),
+      and(eq(ideas.userId, userId), or(like(ideas.title, q), like(ideas.description, q))),
     )
     .limit(10)
-    .all()
-    .map((row) => ({
-      type: 'idea' as const,
-      id: row.id,
-      title: row.title,
-      section: 'Brainstorm',
-    }))
 
-  const historyResults = db
+  const historyRows = await db
     .select()
     .from(historyEntries)
     .where(and(eq(historyEntries.userId, userId), like(historyEntries.title, q)))
     .limit(10)
-    .all()
-    .map((row) => ({
+
+  return [
+    ...draftRows.map((row) => ({
+      type: 'draft' as const,
+      id: row.id,
+      title: row.title,
+      section: 'Drafts',
+    })),
+    ...ideaRows.map((row) => ({
+      type: 'idea' as const,
+      id: row.id,
+      title: row.title,
+      section: 'Brainstorm',
+    })),
+    ...historyRows.map((row) => ({
       type: 'history' as const,
       id: row.id,
       title: row.title,
       section: 'History',
-    }))
-
-  return [...draftResults, ...ideaResults, ...historyResults]
+    })),
+  ]
 }
 
-export function recordExport(userId = DEFAULT_USER_ID) {
-  const session = getWorkspace(userId)
+export async function recordExport(userId = DEFAULT_USER_ID) {
+  const session = await getWorkspace(userId)
   if (!session.document) return
-  addHistoryEntry(session.document.title, 'exported', null, userId)
+  await addHistoryEntry(session.document.title, 'exported', null, userId)
 }

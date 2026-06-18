@@ -50,7 +50,7 @@ export async function workspaceRoutes(app: FastifyInstance) {
 
   app.post('/workspace/thoughts', async (request, reply) => {
     const body = z.object({ text: z.string().min(1) }).parse(request.body)
-    const session = addThought(body.text)
+    const session = await addThought(body.text)
     return reply.status(201).send(session)
   })
 
@@ -70,7 +70,7 @@ export async function workspaceRoutes(app: FastifyInstance) {
 
   app.post('/workspace/approve', async (_request, reply) => {
     try {
-      return approveWorkspace()
+      return await approveWorkspace()
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Approve failed'
       return reply.status(400).send({ error: message })
@@ -79,7 +79,7 @@ export async function workspaceRoutes(app: FastifyInstance) {
 
   app.post('/workspace/reject', async (_request, reply) => {
     try {
-      return rejectWorkspace()
+      return await rejectWorkspace()
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Reject failed'
       return reply.status(400).send({ error: message })
@@ -87,7 +87,7 @@ export async function workspaceRoutes(app: FastifyInstance) {
   })
 
   app.post('/workspace/exported', async () => {
-    recordExport()
+    await recordExport()
     return { ok: true }
   })
 }

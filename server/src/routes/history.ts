@@ -16,7 +16,7 @@ export async function historyRoutes(app: FastifyInstance) {
         entityId: z.string().nullable().optional(),
       })
       .parse(request.body)
-    const entry = addHistoryEntry(body.title, body.action, body.entityId)
+    const entry = await addHistoryEntry(body.title, body.action, body.entityId)
     return reply.status(201).send(entry)
   })
 }

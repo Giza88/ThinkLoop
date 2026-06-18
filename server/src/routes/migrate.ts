@@ -16,13 +16,13 @@ export async function migrateRoutes(app: FastifyInstance) {
       .parse(request.body)
 
     if (body.drafts.length > 0) {
-      bulkImportDrafts(body.drafts as Draft[])
+      await bulkImportDrafts(body.drafts as Draft[])
     }
     if (body.history.length > 0) {
-      bulkImportHistory(body.history as HistoryEntry[])
+      await bulkImportHistory(body.history as HistoryEntry[])
     }
     if (body.integrations.length > 0) {
-      bulkImportIntegrations(body.integrations)
+      await bulkImportIntegrations(body.integrations)
     }
 
     return reply.status(201).send({ ok: true })

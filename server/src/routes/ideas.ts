@@ -18,7 +18,7 @@ export async function ideaRoutes(app: FastifyInstance) {
         tags: z.array(z.string()).default([]),
       })
       .parse(request.body)
-    const idea = createIdea(body.title, body.description, body.tags)
+    const idea = await createIdea(body.title, body.description, body.tags)
     return reply.status(201).send(idea)
   })
 
@@ -30,13 +30,13 @@ export async function ideaRoutes(app: FastifyInstance) {
         tags: z.array(z.string()).optional(),
       })
       .parse(request.body)
-    const idea = updateIdea(request.params.id, body)
+    const idea = await updateIdea(request.params.id, body)
     if (!idea) return reply.status(404).send({ error: 'Idea not found' })
     return idea
   })
 
   app.delete<{ Params: { id: string } }>('/ideas/:id', async (request, reply) => {
-    const ok = deleteIdea(request.params.id)
+    const ok = await deleteIdea(request.params.id)
     if (!ok) return reply.status(404).send({ error: 'Idea not found' })
     return { ok: true }
   })

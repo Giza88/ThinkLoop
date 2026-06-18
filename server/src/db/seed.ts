@@ -42,70 +42,64 @@ const SEED_IDEAS = [
   },
 ]
 
-export function seedDatabase() {
+export async function seedDatabase() {
   const db = getDb()
-  const existing = db.select().from(users).where(eq(users.id, DEFAULT_USER_ID)).get()
+  const [existing] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, DEFAULT_USER_ID))
+    .limit(1)
 
   if (existing) return
 
   const now = new Date().toISOString()
 
-  db.insert(users)
-    .values({
-      id: DEFAULT_USER_ID,
-      displayName: 'Alex Morgan',
-      createdAt: now,
-    })
-    .run()
+  await db.insert(users).values({
+    id: DEFAULT_USER_ID,
+    displayName: 'Alex Morgan',
+    createdAt: now,
+  })
 
-  db.insert(userSettings)
-    .values({
-      userId: DEFAULT_USER_ID,
-      autoSaveDrafts: true,
-      showPrompts: true,
-      requireApproval: true,
-      theme: 'dark',
-      sidebarCollapsed: false,
-    })
-    .run()
+  await db.insert(userSettings).values({
+    userId: DEFAULT_USER_ID,
+    autoSaveDrafts: true,
+    showPrompts: true,
+    requireApproval: true,
+    theme: 'dark',
+    sidebarCollapsed: false,
+  })
 
-  db.insert(workspaceSessions)
-    .values({
-      userId: DEFAULT_USER_ID,
-      thoughtsJson: '[]',
-      documentJson: null,
-      updatedAt: now,
-    })
-    .run()
+  await db.insert(workspaceSessions).values({
+    userId: DEFAULT_USER_ID,
+    thoughtsJson: '[]',
+    documentJson: null,
+    updatedAt: now,
+  })
 
   for (const idea of SEED_IDEAS) {
-    db.insert(ideas)
-      .values({
-        id: idea.id,
-        userId: DEFAULT_USER_ID,
-        title: idea.title,
-        description: idea.description,
-        tagsJson: JSON.stringify(idea.tags),
-        createdAt: now,
-        updatedAt: now,
-      })
-      .run()
+    await db.insert(ideas).values({
+      id: idea.id,
+      userId: DEFAULT_USER_ID,
+      title: idea.title,
+      description: idea.description,
+      tagsJson: JSON.stringify(idea.tags),
+      createdAt: now,
+      updatedAt: now,
+    })
   }
 
   for (const providerId of ['microsoft', 'slack']) {
-    db.insert(integrations)
-      .values({
-        userId: DEFAULT_USER_ID,
-        providerId,
-        connectedAt: now,
-      })
-      .run()
+    await db.insert(integrations).values({
+      userId: DEFAULT_USER_ID,
+      providerId,
+      connectedAt: now,
+    })
   }
 }
 
-export function isDatabaseEmpty() {
+export async function isDatabaseEmpty() {
   const db = getDb()
-  const draftCount = db.select().from(drafts).all().length
-  const historyCount = db.select().from(historyEntries).all().length
-  return draftCount === 0 && historyCount === 0
+  const draftRows = await db.select().from(drafts).limit(1)
+  const historyRows = await db.select().from(historyEntries).limit(1)
+  return draftRows.length === 0 && historyRows.length === 0
 }
