@@ -8,7 +8,9 @@ import {
   type ReactNode,
 } from 'react'
 import { api } from '../api/client'
+import { useToast } from './ToastContext'
 import { loadTheme, saveTheme, type Theme } from '../utils/storage'
+import { getErrorMessage } from '../utils/getErrorMessage'
 
 type ResolvedTheme = 'light' | 'dark'
 
@@ -31,6 +33,7 @@ function resolveTheme(theme: Theme): ResolvedTheme {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
+  const toast = useToast()
   const [theme, setThemeState] = useState<Theme>(() => loadTheme())
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() => resolveTheme(loadTheme()))
 
@@ -45,9 +48,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setThemeState(next)
       saveTheme(next)
       applyTheme(next)
-      api.patchSettings({ theme: next }).catch(console.error)
+      api.patchSettings({ theme: next }).catch((err) => {
+        toast.error(getErrorMessage(err, 'Could not save theme'))
+      })
     },
-    [applyTheme],
+    [applyTheme, toast],
   )
 
   const toggleTheme = useCallback(() => {

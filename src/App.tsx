@@ -13,7 +13,9 @@ import { SearchModal } from './components/SearchModal'
 import { SectionPlaceholder } from './components/SectionPlaceholder'
 import { SettingsView } from './components/SettingsView'
 import { Sidebar } from './components/Sidebar'
+import { useToast } from './context/ToastContext'
 import { PROMPTS } from './data/mockData'
+import { getErrorMessage } from './utils/getErrorMessage'
 import type {
   DashboardStats,
   Draft,
@@ -30,6 +32,7 @@ function documentToMarkdown(doc: StructuredDocument): string {
 }
 
 export default function App() {
+  const toast = useToast()
   const [ready, setReady] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeNav, setActiveNav] = useState('dashboard')
@@ -48,6 +51,7 @@ export default function App() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
 
   const saveWorkspaceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const saveErrorShown = useRef(false)
 
   const refreshDrafts = useCallback(async () => {
     setDrafts(await api.getDrafts())
@@ -65,10 +69,18 @@ export default function App() {
     (nextThoughts: Thought[], nextDoc: StructuredDocument | null) => {
       if (saveWorkspaceTimer.current) clearTimeout(saveWorkspaceTimer.current)
       saveWorkspaceTimer.current = setTimeout(() => {
-        api.saveWorkspace(nextThoughts, nextDoc).catch(console.error)
+        api.saveWorkspace(nextThoughts, nextDoc).catch((err) => {
+          if (!saveErrorShown.current) {
+            saveErrorShown.current = true
+            toast.error(getErrorMessage(err, 'Could not save workspace'))
+            setTimeout(() => {
+              saveErrorShown.current = false
+            }, 5000)
+          }
+        })
       }, 500)
     },
-    [],
+    [toast],
   )
 
   useEffect(() => {
@@ -96,7 +108,9 @@ export default function App() {
         setConnectedIntegrations(integrationsData.connected)
         setStats(statsData)
       } catch (err) {
-        console.error('Failed to load from API', err)
+        toast.error(
+          getErrorMessage(err, 'Could not connect to the API. Run npm run dev to start the server.'),
+        )
       } finally {
         setReady(true)
       }
@@ -106,18 +120,28 @@ export default function App() {
 
   const handleConnectIntegration = useCallback(
     async (providerId: string) => {
-      const { connected } = await api.connectIntegration(providerId)
-      setConnectedIntegrations(connected)
+      try {
+        const { connected } = await api.connectIntegration(providerId)
+        setConnectedIntegrations(connected)
+        toast.success('Integration connected')
+      } catch (err) {
+        toast.error(getErrorMessage(err, 'Could not connect integration'))
+      }
     },
-    [],
+    [toast],
   )
 
   const handleDisconnectIntegration = useCallback(
     async (providerId: string) => {
-      const { connected } = await api.disconnectIntegration(providerId)
-      setConnectedIntegrations(connected)
+      try {
+        const { connected } = await api.disconnectIntegration(providerId)
+        setConnectedIntegrations(connected)
+        toast.success('Integration disconnected')
+      } catch (err) {
+        toast.error(getErrorMessage(err, 'Could not disconnect integration'))
+      }
     },
-    [],
+    [toast],
   )
 
   const handleAddThought = useCallback(async () => {
@@ -130,9 +154,9 @@ export default function App() {
       setStructuredDoc(session.document)
       setInput('')
     } catch (err) {
-      console.error(err)
+      toast.error(getErrorMessage(err, 'Could not add thought'))
     }
-  }, [input])
+  }, [input, toast])
 
   const handleOrganize = useCallback(async () => {
     if (thoughts.length === 0) return
@@ -143,12 +167,13 @@ export default function App() {
       setThoughts(session.thoughts)
       setStructuredDoc(session.document)
       await Promise.all([refreshHistory(), refreshDrafts(), refreshStats()])
+      toast.success('Thoughts organized — review the proposal')
     } catch (err) {
-      console.error(err)
+      toast.error(getErrorMessage(err, 'Could not organize thoughts'))
     } finally {
       setIsOrganizing(false)
     }
-  }, [thoughts.length, refreshHistory, refreshDrafts, refreshStats])
+  }, [thoughts.length, refreshHistory, refreshDrafts, refreshStats, toast])
 
   const handleApprove = useCallback(async () => {
     if (!structuredDoc) return
@@ -157,10 +182,11 @@ export default function App() {
       setThoughts(session.thoughts)
       setStructuredDoc(session.document)
       await Promise.all([refreshHistory(), refreshDrafts(), refreshStats()])
+      toast.success('Document approved and saved')
     } catch (err) {
-      console.error(err)
+      toast.error(getErrorMessage(err, 'Could not approve document'))
     }
-  }, [structuredDoc, refreshHistory, refreshDrafts, refreshStats])
+  }, [structuredDoc, refreshHistory, refreshDrafts, refreshStats, toast])
 
   const handleReject = useCallback(async () => {
     if (!structuredDoc) return
@@ -169,15 +195,21 @@ export default function App() {
       setThoughts(session.thoughts)
       setStructuredDoc(null)
       await refreshHistory()
+      toast.info('Proposal rejected')
     } catch (err) {
-      console.error(err)
+      toast.error(getErrorMessage(err, 'Could not reject proposal'))
     }
-  }, [structuredDoc, refreshHistory])
+  }, [structuredDoc, refreshHistory, toast])
 
   const handleCopy = useCallback(async () => {
     if (!structuredDoc || structuredDoc.approvalStatus !== 'approved') return
-    await navigator.clipboard.writeText(documentToMarkdown(structuredDoc))
-  }, [structuredDoc])
+    try {
+      await navigator.clipboard.writeText(documentToMarkdown(structuredDoc))
+      toast.success('Copied to clipboard')
+    } catch {
+      toast.error('Could not copy to clipboard')
+    }
+  }, [structuredDoc, toast])
 
   const handleExport = useCallback(async () => {
     if (!structuredDoc || structuredDoc.approvalStatus !== 'approved') return
@@ -188,9 +220,14 @@ export default function App() {
     anchor.download = `${structuredDoc.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.md`
     anchor.click()
     URL.revokeObjectURL(url)
-    await api.recordExport()
-    await Promise.all([refreshHistory(), refreshStats()])
-  }, [structuredDoc, refreshHistory, refreshStats])
+    try {
+      await api.recordExport()
+      await Promise.all([refreshHistory(), refreshStats()])
+      toast.success('Document exported')
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Export saved locally but could not update history'))
+    }
+  }, [structuredDoc, refreshHistory, refreshStats, toast])
 
   const handleOpenDraft = useCallback((draft: Draft) => {
     setStructuredDoc({
@@ -204,10 +241,15 @@ export default function App() {
 
   const handleDeleteDraft = useCallback(
     async (id: string) => {
-      await api.deleteDraft(id)
-      await refreshDrafts()
+      try {
+        await api.deleteDraft(id)
+        await refreshDrafts()
+        toast.success('Draft deleted')
+      } catch (err) {
+        toast.error(getErrorMessage(err, 'Could not delete draft'))
+      }
     },
-    [refreshDrafts],
+    [refreshDrafts, toast],
   )
 
   const handleSettingsChange = useCallback(
@@ -216,19 +258,27 @@ export default function App() {
       showPrompts?: boolean
       requireApproval?: boolean
     }) => {
-      const next = await api.patchSettings(patch)
-      setAutoSaveDrafts(next.autoSaveDrafts)
-      setShowPrompts(next.showPrompts)
-      setRequireApproval(next.requireApproval)
+      try {
+        const next = await api.patchSettings(patch)
+        setAutoSaveDrafts(next.autoSaveDrafts)
+        setShowPrompts(next.showPrompts)
+        setRequireApproval(next.requireApproval)
+      } catch (err) {
+        toast.error(getErrorMessage(err, 'Could not save settings'))
+      }
     },
-    [],
+    [toast],
   )
 
   const handleSidebarToggle = useCallback(async () => {
     const next = !sidebarCollapsed
     setSidebarCollapsed(next)
-    await api.patchSettings({ sidebarCollapsed: next })
-  }, [sidebarCollapsed])
+    try {
+      await api.patchSettings({ sidebarCollapsed: next })
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Could not save sidebar preference'))
+    }
+  }, [sidebarCollapsed, toast])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

@@ -1,12 +1,15 @@
 import { Plus, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client'
+import { useToast } from '../context/ToastContext'
 import { TAG_COLORS } from '../data/mockData'
 import type { IdeaCard } from '../types'
+import { getErrorMessage } from '../utils/getErrorMessage'
 
 const TAG_OPTIONS = ['Product', 'UX', 'Marketing', 'Automation', 'PM', 'Engineering', 'Strategy', 'Research']
 
 export function BrainstormBoard() {
+  const toast = useToast()
   const [ideas, setIdeas] = useState<IdeaCard[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -18,11 +21,11 @@ export function BrainstormBoard() {
     try {
       setIdeas(await api.getIdeas())
     } catch (err) {
-      console.error(err)
+      toast.error(getErrorMessage(err, 'Could not load ideas'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [toast])
 
   useEffect(() => {
     loadIdeas()
@@ -54,8 +57,9 @@ export function BrainstormBoard() {
       })
       setIdeas((prev) => [idea, ...prev])
       resetForm()
+      toast.success('Idea saved')
     } catch (err) {
-      console.error(err)
+      toast.error(getErrorMessage(err, 'Could not save idea'))
     }
   }
 

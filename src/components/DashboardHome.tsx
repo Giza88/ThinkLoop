@@ -1,7 +1,9 @@
 import { ArrowRight, Lightbulb, Plug, Sparkles } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
+import { useToast } from '../context/ToastContext'
 import type { DashboardStats, IdeaCard } from '../types'
+import { getErrorMessage } from '../utils/getErrorMessage'
 import { HumanLoopBackbone } from './HumanLoopBackbone'
 import { IntegrationsPanel } from './IntegrationsPanel'
 import { StatsSection } from './StatsSection'
@@ -21,11 +23,15 @@ export function DashboardHome({
   onConnectIntegration,
   onDisconnectIntegration,
 }: DashboardHomeProps) {
+  const toast = useToast()
   const [ideas, setIdeas] = useState<IdeaCard[]>([])
 
   useEffect(() => {
-    api.getIdeas().then(setIdeas).catch(console.error)
-  }, [])
+    api
+      .getIdeas()
+      .then(setIdeas)
+      .catch((err) => toast.error(getErrorMessage(err, 'Could not load ideas')))
+  }, [toast])
   return (
     <div className="space-y-6">
       <div>

@@ -1,7 +1,9 @@
 import { Search, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api/client'
+import { useToast } from '../context/ToastContext'
 import type { SearchResult } from '../types'
+import { getErrorMessage } from '../utils/getErrorMessage'
 
 type SearchModalProps = {
   open: boolean
@@ -16,16 +18,19 @@ const TYPE_LABELS: Record<SearchResult['type'], string> = {
 }
 
 export function SearchModal({ open, onClose, onNavigate }: SearchModalProps) {
+  const toast = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
+  const searchErrorShown = useRef(false)
 
   useEffect(() => {
     if (open) {
       inputRef.current?.focus()
       setQuery('')
       setResults([])
+      searchErrorShown.current = false
     }
   }, [open])
 
@@ -51,15 +56,19 @@ export function SearchModal({ open, onClose, onNavigate }: SearchModalProps) {
       setLoading(true)
       try {
         setResults(await api.search(query))
-      } catch {
+      } catch (err) {
         setResults([])
+        if (!searchErrorShown.current) {
+          searchErrorShown.current = true
+          toast.error(getErrorMessage(err, 'Search is unavailable'))
+        }
       } finally {
         setLoading(false)
       }
     }, 200)
 
     return () => clearTimeout(timer)
-  }, [query, open])
+  }, [query, open, toast])
 
   if (!open) return null
 
