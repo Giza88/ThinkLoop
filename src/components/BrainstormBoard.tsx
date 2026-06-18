@@ -1,16 +1,32 @@
 import { Plus, X } from 'lucide-react'
-import { useState } from 'react'
-import { IDEA_CARDS, TAG_COLORS } from '../data/mockData'
+import { useCallback, useEffect, useState } from 'react'
+import { api } from '../api/client'
+import { TAG_COLORS } from '../data/mockData'
 import type { IdeaCard } from '../types'
 
 const TAG_OPTIONS = ['Product', 'UX', 'Marketing', 'Automation', 'PM', 'Engineering', 'Strategy', 'Research']
 
 export function BrainstormBoard() {
-  const [ideas, setIdeas] = useState<IdeaCard[]>(IDEA_CARDS)
+  const [ideas, setIdeas] = useState<IdeaCard[]>([])
+  const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
+
+  const loadIdeas = useCallback(async () => {
+    try {
+      setIdeas(await api.getIdeas())
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadIdeas()
+  }, [loadIdeas])
 
   function resetForm() {
     setTitle('')
@@ -25,21 +41,30 @@ export function BrainstormBoard() {
     )
   }
 
-  function handleAddIdea() {
+  async function handleAddIdea() {
     const trimmedTitle = title.trim()
     const trimmedDescription = description.trim()
     if (!trimmedTitle || !trimmedDescription) return
 
-    setIdeas((prev) => [
-      {
-        id: crypto.randomUUID(),
+    try {
+      const idea = await api.createIdea({
         title: trimmedTitle,
         description: trimmedDescription,
         tags: selectedTags.length > 0 ? selectedTags : ['Product'],
-      },
-      ...prev,
-    ])
-    resetForm()
+      })
+      setIdeas((prev) => [idea, ...prev])
+      resetForm()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-48 items-center justify-center">
+        <p className="text-sm text-tl-gray-500">Loading ideas…</p>
+      </div>
+    )
   }
 
   return (
@@ -60,7 +85,7 @@ export function BrainstormBoard() {
           <button
             type="button"
             onClick={() => setShowForm((open) => !open)}
-            className="flex items-center gap-1.5 rounded-xl bg-tl-brand bg-tl-brand-hover px-4 py-2 text-sm font-medium text-white transition-colors "
+            className="flex items-center gap-1.5 rounded-xl bg-tl-brand bg-tl-brand-hover px-4 py-2 text-sm font-medium text-white transition-colors"
           >
             {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
             {showForm ? 'Cancel' : 'Add Idea'}
@@ -75,14 +100,14 @@ export function BrainstormBoard() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Idea title"
-                className="w-full rounded-xl border border-tl-gray-200 bg-surface px-4 py-2.5 text-sm text-tl-gray-700 outline-none focus:border-tl-cyan-300 focus:ring-2 focus:ring-tl-purple-100"
+                className="tl-input w-full px-4 py-2.5 text-sm"
               />
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe the idea..."
                 rows={3}
-                className="w-full resize-none rounded-xl border border-tl-gray-200 bg-surface px-4 py-2.5 text-sm text-tl-gray-700 outline-none focus:border-tl-cyan-300 focus:ring-2 focus:ring-tl-purple-100"
+                className="tl-input w-full resize-none px-4 py-2.5 text-sm"
               />
               <div className="flex flex-wrap gap-1.5">
                 {TAG_OPTIONS.map((tag) => (
@@ -104,7 +129,7 @@ export function BrainstormBoard() {
                 type="button"
                 onClick={handleAddIdea}
                 disabled={!title.trim() || !description.trim()}
-                className="rounded-xl bg-tl-brand bg-tl-brand-hover px-4 py-2 text-sm font-medium text-white  disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl bg-tl-brand bg-tl-brand-hover px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Save idea
               </button>

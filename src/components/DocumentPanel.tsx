@@ -141,7 +141,7 @@ export function DocumentPanel({
             </div>
             <div className="mt-4 flex items-center justify-between border-t border-tl-gray-100 pt-4">
               <p className="text-xs text-tl-gray-400">
-                Proposed {document.generatedAt.toLocaleTimeString()}
+                Proposed {new Date(document.generatedAt).toLocaleTimeString()}
                 {isApproved && ' · Approved by you'}
               </p>
               {isApproved && (

@@ -1,7 +1,7 @@
 import { Bell, Moon, Shield, Sparkles, Sun } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 import { IntegrationsPanel } from './IntegrationsPanel'
-import type { Theme } from '../utils/storage'
+import type { Theme } from '../types'
 
 type SettingsViewProps = {
   autoSaveDrafts: boolean

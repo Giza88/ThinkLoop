@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { api } from '../api/client'
 import { loadTheme, saveTheme, type Theme } from '../utils/storage'
 
 type ResolvedTheme = 'light' | 'dark'
@@ -44,6 +45,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setThemeState(next)
       saveTheme(next)
       applyTheme(next)
+      api.patchSettings({ theme: next }).catch(console.error)
     },
     [applyTheme],
   )
@@ -65,6 +67,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     media.addEventListener('change', onChange)
     return () => media.removeEventListener('change', onChange)
+  }, [applyTheme, theme])
+
+  useEffect(() => {
+    api
+      .getSettings()
+      .then((settings) => {
+        if (settings.theme !== theme) {
+          setThemeState(settings.theme)
+          saveTheme(settings.theme)
+          applyTheme(settings.theme)
+        }
+      })
+      .catch(() => {
+        // API not ready yet — localStorage / inline script applies theme
+      })
   }, [applyTheme, theme])
 
   const value = useMemo(

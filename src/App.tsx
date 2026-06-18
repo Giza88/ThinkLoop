@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { api } from './api/client'
+import { migrateLocalStorageIfNeeded } from './api/migrate'
 import { BrainstormBoard } from './components/BrainstormBoard'
 import { CapturePanel } from './components/CapturePanel'
 import { DashboardHome } from './components/DashboardHome'
@@ -12,16 +14,13 @@ import { SectionPlaceholder } from './components/SectionPlaceholder'
 import { SettingsView } from './components/SettingsView'
 import { Sidebar } from './components/Sidebar'
 import { PROMPTS } from './data/mockData'
-import type { Draft, HistoryEntry, StructuredDocument, Thought } from './types'
-import { organizeThoughts } from './utils/organizeThoughts'
-import {
-  loadConnectedIntegrations,
-  loadDrafts,
-  loadHistory,
-  saveConnectedIntegrations,
-  saveDrafts,
-  saveHistory,
-} from './utils/storage'
+import type {
+  DashboardStats,
+  Draft,
+  HistoryEntry,
+  StructuredDocument,
+  Thought,
+} from './types'
 
 function documentToMarkdown(doc: StructuredDocument): string {
   const sections = doc.sections
@@ -30,13 +29,8 @@ function documentToMarkdown(doc: StructuredDocument): string {
   return `# ${doc.title}\n\n${sections}`
 }
 
-function documentPreview(doc: StructuredDocument): string {
-  const firstSection = doc.sections[0]
-  if (!firstSection) return doc.title
-  return firstSection.content.replace(/^•\s*/gm, '').slice(0, 140)
-}
-
-function App() {
+export default function App() {
+  const [ready, setReady] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeNav, setActiveNav] = useState('dashboard')
   const [searchOpen, setSearchOpen] = useState(false)
@@ -45,145 +39,147 @@ function App() {
   const [thoughts, setThoughts] = useState<Thought[]>([])
   const [structuredDoc, setStructuredDoc] = useState<StructuredDocument | null>(null)
   const [isOrganizing, setIsOrganizing] = useState(false)
-  const [drafts, setDrafts] = useState<Draft[]>(() => loadDrafts())
-  const [history, setHistory] = useState<HistoryEntry[]>(() => loadHistory())
-  const [connectedIntegrations, setConnectedIntegrations] = useState<string[]>(() =>
-    loadConnectedIntegrations(),
-  )
+  const [drafts, setDrafts] = useState<Draft[]>([])
+  const [history, setHistory] = useState<HistoryEntry[]>([])
+  const [connectedIntegrations, setConnectedIntegrations] = useState<string[]>([])
   const [autoSaveDrafts, setAutoSaveDrafts] = useState(true)
   const [showPrompts, setShowPrompts] = useState(true)
   const [requireApproval, setRequireApproval] = useState(true)
+  const [stats, setStats] = useState<DashboardStats | null>(null)
 
-  useEffect(() => {
-    saveDrafts(drafts)
-  }, [drafts])
+  const saveWorkspaceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  useEffect(() => {
-    saveHistory(history)
-  }, [history])
+  const refreshDrafts = useCallback(async () => {
+    setDrafts(await api.getDrafts())
+  }, [])
 
-  useEffect(() => {
-    saveConnectedIntegrations(connectedIntegrations)
-  }, [connectedIntegrations])
+  const refreshHistory = useCallback(async () => {
+    setHistory(await api.getHistory())
+  }, [])
 
-  const addHistoryEntry = useCallback(
-    (title: string, action: HistoryEntry['action']) => {
-      setHistory((prev) => [
-        {
-          id: crypto.randomUUID(),
-          title,
-          action,
-          timestamp: new Date().toISOString(),
-        },
-        ...prev,
-      ].slice(0, 50))
+  const refreshStats = useCallback(async () => {
+    setStats(await api.getStats())
+  }, [])
+
+  const scheduleWorkspaceSave = useCallback(
+    (nextThoughts: Thought[], nextDoc: StructuredDocument | null) => {
+      if (saveWorkspaceTimer.current) clearTimeout(saveWorkspaceTimer.current)
+      saveWorkspaceTimer.current = setTimeout(() => {
+        api.saveWorkspace(nextThoughts, nextDoc).catch(console.error)
+      }, 500)
     },
     [],
   )
 
-  const handleConnectIntegration = useCallback((providerId: string) => {
-    setConnectedIntegrations((prev) =>
-      prev.includes(providerId) ? prev : [...prev, providerId],
-    )
-  }, [])
+  useEffect(() => {
+    async function bootstrap() {
+      try {
+        await migrateLocalStorageIfNeeded()
+        const [settings, workspace, draftsData, historyData, integrationsData, statsData] =
+          await Promise.all([
+            api.getSettings(),
+            api.getWorkspace(),
+            api.getDrafts(),
+            api.getHistory(),
+            api.getIntegrations(),
+            api.getStats(),
+          ])
 
-  const handleDisconnectIntegration = useCallback((providerId: string) => {
-    setConnectedIntegrations((prev) => prev.filter((id) => id !== providerId))
-  }, [])
-
-  const saveDraft = useCallback((doc: StructuredDocument) => {
-    const preview = documentPreview(doc)
-    setDrafts((prev) => {
-      const existing = prev.find((draft) => draft.title === doc.title)
-      if (existing) {
-        return prev.map((draft) =>
-          draft.id === existing.id
-            ? {
-                ...draft,
-                preview,
-                updatedAt: new Date().toISOString(),
-                document: {
-                  ...doc,
-                  generatedAt: doc.generatedAt,
-                },
-              }
-            : draft,
-        )
+        setAutoSaveDrafts(settings.autoSaveDrafts)
+        setShowPrompts(settings.showPrompts)
+        setRequireApproval(settings.requireApproval)
+        setSidebarCollapsed(settings.sidebarCollapsed)
+        setThoughts(workspace.thoughts)
+        setStructuredDoc(workspace.document)
+        setDrafts(draftsData)
+        setHistory(historyData)
+        setConnectedIntegrations(integrationsData.connected)
+        setStats(statsData)
+      } catch (err) {
+        console.error('Failed to load from API', err)
+      } finally {
+        setReady(true)
       }
-
-      return [
-        {
-          id: crypto.randomUUID(),
-          title: doc.title,
-          preview,
-          updatedAt: new Date().toISOString(),
-          document: doc,
-        },
-        ...prev,
-      ]
-    })
+    }
+    bootstrap()
   }, [])
 
-  const handleAddThought = useCallback(() => {
+  const handleConnectIntegration = useCallback(
+    async (providerId: string) => {
+      const { connected } = await api.connectIntegration(providerId)
+      setConnectedIntegrations(connected)
+    },
+    [],
+  )
+
+  const handleDisconnectIntegration = useCallback(
+    async (providerId: string) => {
+      const { connected } = await api.disconnectIntegration(providerId)
+      setConnectedIntegrations(connected)
+    },
+    [],
+  )
+
+  const handleAddThought = useCallback(async () => {
     const text = input.trim()
     if (!text) return
 
-    setThoughts((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), text, createdAt: new Date() },
-    ])
-    setInput('')
+    try {
+      const session = await api.addThought(text)
+      setThoughts(session.thoughts)
+      setStructuredDoc(session.document)
+      setInput('')
+    } catch (err) {
+      console.error(err)
+    }
   }, [input])
 
   const handleOrganize = useCallback(async () => {
     if (thoughts.length === 0) return
 
     setIsOrganizing(true)
-    await new Promise((resolve) => setTimeout(resolve, 1200))
-    const doc = organizeThoughts(thoughts)
-    const proposal: StructuredDocument = {
-      ...doc,
-      approvalStatus: requireApproval ? 'pending' : 'approved',
+    try {
+      const session = await api.organizeWorkspace()
+      setThoughts(session.thoughts)
+      setStructuredDoc(session.document)
+      await Promise.all([refreshHistory(), refreshDrafts(), refreshStats()])
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setIsOrganizing(false)
     }
-    setStructuredDoc(proposal)
-    setIsOrganizing(false)
+  }, [thoughts.length, refreshHistory, refreshDrafts, refreshStats])
 
-    addHistoryEntry(doc.title, 'organized')
-
-    if (!requireApproval && autoSaveDrafts) {
-      saveDraft(proposal)
-      addHistoryEntry(doc.title, 'saved')
-    }
-  }, [thoughts, requireApproval, autoSaveDrafts, addHistoryEntry, saveDraft])
-
-  const handleApprove = useCallback(() => {
+  const handleApprove = useCallback(async () => {
     if (!structuredDoc) return
-
-    const approved: StructuredDocument = {
-      ...structuredDoc,
-      approvalStatus: 'approved',
+    try {
+      const session = await api.approveWorkspace()
+      setThoughts(session.thoughts)
+      setStructuredDoc(session.document)
+      await Promise.all([refreshHistory(), refreshDrafts(), refreshStats()])
+    } catch (err) {
+      console.error(err)
     }
-    setStructuredDoc(approved)
-    addHistoryEntry(structuredDoc.title, 'approved')
+  }, [structuredDoc, refreshHistory, refreshDrafts, refreshStats])
 
-    if (autoSaveDrafts) {
-      saveDraft(approved)
-      addHistoryEntry(structuredDoc.title, 'saved')
-    }
-  }, [structuredDoc, autoSaveDrafts, addHistoryEntry, saveDraft])
-
-  const handleReject = useCallback(() => {
+  const handleReject = useCallback(async () => {
     if (!structuredDoc) return
-    addHistoryEntry(structuredDoc.title, 'rejected')
-    setStructuredDoc(null)
-  }, [structuredDoc, addHistoryEntry])
+    try {
+      const session = await api.rejectWorkspace()
+      setThoughts(session.thoughts)
+      setStructuredDoc(null)
+      await refreshHistory()
+    } catch (err) {
+      console.error(err)
+    }
+  }, [structuredDoc, refreshHistory])
 
   const handleCopy = useCallback(async () => {
     if (!structuredDoc || structuredDoc.approvalStatus !== 'approved') return
     await navigator.clipboard.writeText(documentToMarkdown(structuredDoc))
   }, [structuredDoc])
 
-  const handleExport = useCallback(() => {
+  const handleExport = useCallback(async () => {
     if (!structuredDoc || structuredDoc.approvalStatus !== 'approved') return
     const blob = new Blob([documentToMarkdown(structuredDoc)], { type: 'text/markdown' })
     const url = URL.createObjectURL(blob)
@@ -192,22 +188,47 @@ function App() {
     anchor.download = `${structuredDoc.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.md`
     anchor.click()
     URL.revokeObjectURL(url)
-    addHistoryEntry(structuredDoc.title, 'exported')
-  }, [structuredDoc, addHistoryEntry])
+    await api.recordExport()
+    await Promise.all([refreshHistory(), refreshStats()])
+  }, [structuredDoc, refreshHistory, refreshStats])
 
   const handleOpenDraft = useCallback((draft: Draft) => {
     setStructuredDoc({
       ...draft.document,
-      generatedAt: new Date(draft.document.generatedAt),
       approvalStatus: draft.document.approvalStatus ?? 'approved',
     })
     setThoughts([])
     setActiveNav('workspace')
-  }, [])
+    scheduleWorkspaceSave([], draft.document)
+  }, [scheduleWorkspaceSave])
 
-  const handleDeleteDraft = useCallback((id: string) => {
-    setDrafts((prev) => prev.filter((draft) => draft.id !== id))
-  }, [])
+  const handleDeleteDraft = useCallback(
+    async (id: string) => {
+      await api.deleteDraft(id)
+      await refreshDrafts()
+    },
+    [refreshDrafts],
+  )
+
+  const handleSettingsChange = useCallback(
+    async (patch: {
+      autoSaveDrafts?: boolean
+      showPrompts?: boolean
+      requireApproval?: boolean
+    }) => {
+      const next = await api.patchSettings(patch)
+      setAutoSaveDrafts(next.autoSaveDrafts)
+      setShowPrompts(next.showPrompts)
+      setRequireApproval(next.requireApproval)
+    },
+    [],
+  )
+
+  const handleSidebarToggle = useCallback(async () => {
+    const next = !sidebarCollapsed
+    setSidebarCollapsed(next)
+    await api.patchSettings({ sidebarCollapsed: next })
+  }, [sidebarCollapsed])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -221,12 +242,21 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
+  if (!ready) {
+    return (
+      <div className="flex h-full items-center justify-center bg-tl-mesh">
+        <p className="text-sm text-tl-gray-500">Loading ThinkLoop…</p>
+      </div>
+    )
+  }
+
   const renderContent = () => {
     switch (activeNav) {
       case 'dashboard':
         return (
           <DashboardHome
             connectedIntegrations={connectedIntegrations}
+            stats={stats}
             onNavigate={setActiveNav}
             onConnectIntegration={handleConnectIntegration}
             onDisconnectIntegration={handleDisconnectIntegration}
@@ -298,9 +328,9 @@ function App() {
             showPrompts={showPrompts}
             requireApproval={requireApproval}
             connectedIntegrations={connectedIntegrations}
-            onAutoSaveChange={setAutoSaveDrafts}
-            onShowPromptsChange={setShowPrompts}
-            onRequireApprovalChange={setRequireApproval}
+            onAutoSaveChange={(v) => handleSettingsChange({ autoSaveDrafts: v })}
+            onShowPromptsChange={(v) => handleSettingsChange({ showPrompts: v })}
+            onRequireApprovalChange={(v) => handleSettingsChange({ requireApproval: v })}
             onConnectIntegration={handleConnectIntegration}
             onDisconnectIntegration={handleDisconnectIntegration}
           />
@@ -346,7 +376,7 @@ function App() {
         collapsed={sidebarCollapsed}
         activeItem={activeNav}
         draftCount={drafts.length}
-        onToggle={() => setSidebarCollapsed((c) => !c)}
+        onToggle={handleSidebarToggle}
         onNavigate={setActiveNav}
       />
 
@@ -355,9 +385,20 @@ function App() {
         <main className="flex-1 overflow-y-auto p-6 md:p-8">{renderContent()}</main>
       </div>
 
-      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <SearchModal
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onNavigate={(section) => {
+          const map: Record<string, string> = {
+            Drafts: 'drafts',
+            Brainstorm: 'brainstorm',
+            History: 'history',
+          }
+          const nav = map[section]
+          if (nav) setActiveNav(nav)
+          setSearchOpen(false)
+        }}
+      />
     </div>
   )
 }
-
-export default App

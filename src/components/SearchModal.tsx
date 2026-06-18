@@ -1,37 +1,65 @@
 import { Search, X } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { api } from '../api/client'
+import type { SearchResult } from '../types'
 
 type SearchModalProps = {
   open: boolean
   onClose: () => void
+  onNavigate?: (section: string) => void
 }
 
-const SEARCH_ITEMS = [
-  { type: 'Idea', title: 'Personalized onboarding flow', section: 'Brainstorm' },
-  { type: 'Draft', title: 'Q3 product strategy notes', section: 'Drafts' },
-  { type: 'Summary', title: 'Competitor analysis — June', section: 'Summaries' },
-  { type: 'Research', title: 'User interview insights', section: 'Research' },
-]
+const TYPE_LABELS: Record<SearchResult['type'], string> = {
+  draft: 'Draft',
+  idea: 'Idea',
+  history: 'History',
+}
 
-export function SearchModal({ open, onClose }: SearchModalProps) {
+export function SearchModal({ open, onClose, onNavigate }: SearchModalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<SearchResult[]>([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (open) {
       inputRef.current?.focus()
+      setQuery('')
+      setResults([])
     }
   }, [open])
 
   useEffect(() => {
+    if (!open) return
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) {
-        onClose()
-      }
+      if (e.key === 'Escape') onClose()
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [open, onClose])
+
+  useEffect(() => {
+    if (!open) return
+
+    const timer = setTimeout(async () => {
+      if (!query.trim()) {
+        setResults([])
+        return
+      }
+      setLoading(true)
+      try {
+        setResults(await api.search(query))
+      } catch {
+        setResults([])
+      } finally {
+        setLoading(false)
+      }
+    }, 200)
+
+    return () => clearTimeout(timer)
+  }, [query, open])
 
   if (!open) return null
 
@@ -43,6 +71,8 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
           <input
             ref={inputRef}
             type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder="Search ideas, drafts, summaries…"
             className="flex-1 bg-transparent text-sm text-tl-gray-800 outline-none placeholder:text-tl-gray-400"
           />
@@ -57,14 +87,26 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
         </div>
 
         <div className="max-h-64 overflow-y-auto p-2">
-          {SEARCH_ITEMS.map((item) => (
+          {loading && (
+            <p className="px-3 py-4 text-center text-xs text-tl-gray-400">Searching…</p>
+          )}
+          {!loading && query.trim() && results.length === 0 && (
+            <p className="px-3 py-4 text-center text-xs text-tl-gray-400">No results found</p>
+          )}
+          {!loading && !query.trim() && (
+            <p className="px-3 py-4 text-center text-xs text-tl-gray-400">
+              Type to search drafts, ideas, and history
+            </p>
+          )}
+          {results.map((item) => (
             <button
-              key={item.title}
+              key={`${item.type}-${item.id}`}
               type="button"
+              onClick={() => onNavigate?.(item.section)}
               className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-tl-gray-100/80 dark:hover:bg-tl-gray-200/10"
             >
               <span className="rounded-md bg-tl-gray-100 px-2 py-0.5 text-[10px] font-medium text-tl-gray-500">
-                {item.type}
+                {TYPE_LABELS[item.type]}
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm text-tl-gray-700">{item.title}</p>

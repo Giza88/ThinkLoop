@@ -1,4 +1,4 @@
-import type { StructuredDocument, Thought } from '../types'
+import type { StructuredDocument, Thought } from '../../../shared/types.js'
 
 function extractTitle(thoughts: Thought[]): string {
   const first = thoughts[0]?.text.trim()
@@ -66,4 +66,10 @@ export function organizeThoughts(thoughts: Thought[]): StructuredDocument {
     sections,
     generatedAt: new Date().toISOString(),
   }
+}
+
+export function documentPreview(doc: StructuredDocument): string {
+  const firstSection = doc.sections[0]
+  if (!firstSection) return doc.title
+  return firstSection.content.replace(/^•\s*/gm, '').slice(0, 140)
 }

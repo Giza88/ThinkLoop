@@ -1,10 +1,14 @@
 import { ArrowRight, Lightbulb, Plug, Sparkles } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { api } from '../api/client'
+import type { DashboardStats, IdeaCard } from '../types'
 import { HumanLoopBackbone } from './HumanLoopBackbone'
 import { IntegrationsPanel } from './IntegrationsPanel'
 import { StatsSection } from './StatsSection'
 
 type DashboardHomeProps = {
   connectedIntegrations: string[]
+  stats: DashboardStats | null
   onNavigate: (view: string) => void
   onConnectIntegration: (providerId: string) => void
   onDisconnectIntegration: (providerId: string) => void
@@ -12,10 +16,16 @@ type DashboardHomeProps = {
 
 export function DashboardHome({
   connectedIntegrations,
+  stats,
   onNavigate,
   onConnectIntegration,
   onDisconnectIntegration,
 }: DashboardHomeProps) {
+  const [ideas, setIdeas] = useState<IdeaCard[]>([])
+
+  useEffect(() => {
+    api.getIdeas().then(setIdeas).catch(console.error)
+  }, [])
   return (
     <div className="space-y-6">
       <div>
@@ -96,7 +106,7 @@ export function DashboardHome({
         </button>
       </div>
 
-      <StatsSection />
+      <StatsSection ideas={ideas} stats={stats} />
     </div>
   )
 }
