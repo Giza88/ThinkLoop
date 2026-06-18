@@ -1,6 +1,10 @@
 import type {
   DashboardStats,
+  DemoEmail,
   Draft,
+  EmailAnalyzeResult,
+  EmailDraft,
+  EmailQuestionAnswer,
   HistoryEntry,
   IdeaCard,
   SearchResult,
@@ -95,6 +99,20 @@ export const api = {
   search: (q: string) =>
     request<SearchResult[]>(`/search?q=${encodeURIComponent(q)}`),
   getStats: () => request<DashboardStats>('/stats'),
+
+  analyzeEmail: (email: DemoEmail) =>
+    request<EmailAnalyzeResult>('/email/analyze', {
+      method: 'POST',
+      body: JSON.stringify(email),
+    }),
+  draftEmailReply: (
+    email: DemoEmail,
+    payload: { answers: EmailQuestionAnswer[] },
+  ) =>
+    request<EmailDraft>('/email/draft', {
+      method: 'POST',
+      body: JSON.stringify({ email, answers: payload.answers }),
+    }),
 
   migrateLocal: (data: {
     drafts: Draft[]

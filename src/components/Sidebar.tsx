@@ -5,6 +5,7 @@ import {
   History,
   LayoutDashboard,
   Lightbulb,
+  Mail,
   Search,
   Settings,
   Sparkles,
@@ -39,6 +40,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { id: 'workspace', label: 'AI Workspace', icon: Sparkles },
+      { id: 'email-reply', label: 'Email Reply', icon: Mail },
       { id: 'brainstorm', label: 'Brainstorm', icon: Lightbulb },
     ],
   },

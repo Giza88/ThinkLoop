@@ -6,6 +6,7 @@ import { CapturePanel } from './components/CapturePanel'
 import { DashboardHome } from './components/DashboardHome'
 import { DocumentPanel } from './components/DocumentPanel'
 import { DraftsView } from './components/DraftsView'
+import { EmailReplyView } from './components/EmailReplyView'
 import { Header } from './components/Header'
 import { HistoryView } from './components/HistoryView'
 import { ProcessSteps } from './components/ProcessSteps'
@@ -355,6 +356,9 @@ export default function App() {
             </div>
           </div>
         )
+
+      case 'email-reply':
+        return <EmailReplyView outlookConnected={connectedIntegrations.includes('microsoft')} />
 
       case 'brainstorm':
         return <BrainstormBoard />

@@ -136,9 +136,7 @@ export async function organizeWorkspace(userId = DEFAULT_USER_ID) {
     throw new Error('No thoughts to organize')
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 1200))
-
-  const doc = organizeThoughts(session.thoughts)
+  const doc = await organizeThoughts(session.thoughts)
   const proposal: StructuredDocument = {
     ...doc,
     approvalStatus: settings.requireApproval ? 'pending' : 'approved',

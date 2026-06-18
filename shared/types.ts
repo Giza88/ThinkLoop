@@ -82,3 +82,39 @@ export type SearchResult = {
   title: string
   section: string
 }
+
+export type DemoEmail = {
+  id: string
+  from: string
+  fromEmail: string
+  subject: string
+  body: string
+  receivedAt: string
+  source: 'outlook' | 'gmail'
+}
+
+export type EmailInput = DemoEmail
+
+export type EmailQuestion = {
+  id: string
+  question: string
+  hint?: string
+}
+
+export type EmailAnalyzeResult = {
+  summary: string
+  questions: EmailQuestion[]
+}
+
+export type EmailQuestionAnswer = {
+  questionId: string
+  question: string
+  answer: string
+}
+
+export type EmailDraft = {
+  subject: string
+  body: string
+  generatedAt: string
+  approvalStatus?: DocumentApprovalStatus
+}

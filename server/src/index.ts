@@ -1,8 +1,9 @@
 import cors from '@fastify/cors'
 import Fastify from 'fastify'
-import { PORT } from './config.js'
+import { PORT, getOrganizerMode } from './config.js'
 import { runMigrations } from './db/migrate.js'
 import { seedDatabase } from './db/seed.js'
+import { emailRoutes } from './routes/email.js'
 import { draftRoutes } from './routes/drafts.js'
 import { historyRoutes } from './routes/history.js'
 import { ideaRoutes } from './routes/ideas.js'
@@ -16,7 +17,11 @@ const app = Fastify({ logger: true })
 
 await app.register(cors, { origin: true })
 
-app.get('/health', async () => ({ ok: true, db: 'connected' }))
+app.get('/health', async () => ({
+  ok: true,
+  db: 'connected',
+  organizer: getOrganizerMode(),
+}))
 
 await app.register(
   async (api) => {
@@ -26,6 +31,7 @@ await app.register(
     await api.register(ideaRoutes)
     await api.register(integrationRoutes)
     await api.register(workspaceRoutes)
+    await api.register(emailRoutes)
     await api.register(searchRoutes)
     await api.register(migrateRoutes)
   },

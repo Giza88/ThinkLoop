@@ -1,4 +1,6 @@
 import type { StructuredDocument, Thought } from '../../../shared/types.js'
+import { isOpenRouterEnabled } from '../config.js'
+import { organizeWithOpenRouter } from './openrouter.js'
 
 function extractTitle(thoughts: Thought[]): string {
   const first = thoughts[0]?.text.trim()
@@ -51,7 +53,7 @@ function groupThoughts(thoughts: Thought[]): { title: string; content: string }[
     }))
 }
 
-export function organizeThoughts(thoughts: Thought[]): StructuredDocument {
+export function organizeThoughtsWithRules(thoughts: Thought[]): StructuredDocument {
   const sections = groupThoughts(thoughts)
 
   if (sections.length === 0) {
@@ -66,6 +68,18 @@ export function organizeThoughts(thoughts: Thought[]): StructuredDocument {
     sections,
     generatedAt: new Date().toISOString(),
   }
+}
+
+export async function organizeThoughts(thoughts: Thought[]): Promise<StructuredDocument> {
+  if (isOpenRouterEnabled()) {
+    try {
+      return await organizeWithOpenRouter(thoughts)
+    } catch (err) {
+      console.error('[organize] OpenRouter failed, using rule-based fallback:', err)
+    }
+  }
+
+  return organizeThoughtsWithRules(thoughts)
 }
 
 export function documentPreview(doc: StructuredDocument): string {
