@@ -27,17 +27,17 @@ export function DocumentPanel({
   const canExport = document && isApproved
 
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+    <div className="flex h-full flex-col tl-card">
+      <div className="flex items-center justify-between border-b border-tl-gray-100 px-5 py-4">
         <div>
-          <h3 className="text-sm font-semibold text-slate-900">
+          <h3 className="text-sm font-semibold text-tl-gray-900">
             {document ? document.title : 'Your document will appear here'}
           </h3>
           {document && isPending && (
-            <p className="mt-0.5 text-[11px] text-amber-600">Awaiting your approval</p>
+            <p className="mt-0.5 text-[11px] text-tl-purple-600">Awaiting your approval</p>
           )}
           {document && isApproved && (
-            <p className="mt-0.5 text-[11px] text-emerald-600">Approved — ready to export or send</p>
+            <p className="mt-0.5 text-[11px] text-tl-cyan-500">Approved — ready to export or send</p>
           )}
         </div>
         {canExport && (
@@ -45,7 +45,7 @@ export function DocumentPanel({
             <button
               type="button"
               onClick={onCopy}
-              className="rounded-lg border border-slate-200 p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-700"
+              className="rounded-lg border border-tl-gray-200 p-2 text-tl-gray-500 transition-colors hover:bg-tl-gray-50 hover:text-tl-gray-700"
               aria-label="Copy document"
             >
               <Copy className="h-4 w-4" />
@@ -53,7 +53,7 @@ export function DocumentPanel({
             <button
               type="button"
               onClick={onExport}
-              className="rounded-lg border border-slate-200 p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-700"
+              className="rounded-lg border border-tl-gray-200 p-2 text-tl-gray-500 transition-colors hover:bg-tl-gray-50 hover:text-tl-gray-700"
               aria-label="Export document"
             >
               <Download className="h-4 w-4" />
@@ -63,13 +63,13 @@ export function DocumentPanel({
       </div>
 
       {document && isPending && (
-        <div className="border-b border-amber-100 bg-amber-50 px-5 py-3">
+        <div className="border-b border-tl-purple-100 bg-tl-purple-50 px-5 py-3">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex gap-2">
-              <Shield className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+              <Shield className="mt-0.5 h-4 w-4 shrink-0 text-tl-purple-600" />
               <div>
-                <p className="text-xs font-semibold text-amber-900">Agent proposal — you decide</p>
-                <p className="mt-0.5 text-[11px] leading-relaxed text-amber-800">
+                <p className="text-xs font-semibold text-tl-purple-800">Agent proposal — you decide</p>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-tl-purple-700">
                   AI structured this from your thoughts. Review every section, then approve or
                   reject. Nothing is saved or exported until you approve.
                 </p>
@@ -79,7 +79,7 @@ export function DocumentPanel({
               <button
                 type="button"
                 onClick={onReject}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-tl-gray-200 bg-surface px-3 py-1.5 text-xs font-medium text-tl-gray-600 transition-colors hover:bg-tl-gray-50"
               >
                 <XCircle className="h-3.5 w-3.5" />
                 Reject
@@ -87,7 +87,7 @@ export function DocumentPanel({
               <button
                 type="button"
                 onClick={onApprove}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-emerald-700"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-tl-cyan-500 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-tl-cyan-600"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 Approve
@@ -100,11 +100,11 @@ export function DocumentPanel({
       <div className="flex flex-1 flex-col p-5">
         {!document ? (
           <div className="flex flex-1 flex-col items-center justify-center text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
-              <FileText className="h-8 w-8 text-slate-400" />
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-tl-gray-100">
+              <FileText className="h-8 w-8 text-tl-gray-400" />
             </div>
-            <p className="text-sm font-medium text-slate-600">Your document will appear here</p>
-            <p className="mt-2 max-w-xs text-xs text-slate-400">
+            <p className="text-sm font-medium text-tl-gray-600">Your document will appear here</p>
+            <p className="mt-2 max-w-xs text-xs text-tl-gray-400">
               Add your thoughts on the left, then click &quot;Organize into a document&quot; — the
               agent proposes a structure. You approve before anything is saved or exported.
             </p>
@@ -112,7 +112,7 @@ export function DocumentPanel({
               type="button"
               onClick={onOrganize}
               disabled={thoughtCount === 0 || isOrganizing}
-              className="mt-6 flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-6 flex items-center gap-2 rounded-xl bg-tl-brand bg-tl-brand-hover px-5 py-2.5 text-sm font-medium text-white transition-colors  disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isOrganizing ? (
                 <>
@@ -132,15 +132,15 @@ export function DocumentPanel({
             <div className="flex-1 space-y-5 overflow-y-auto pr-1">
               {document.sections.map((section) => (
                 <div key={section.title}>
-                  <h4 className="mb-2 text-sm font-semibold text-slate-900">{section.title}</h4>
-                  <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600">
+                  <h4 className="mb-2 text-sm font-semibold text-tl-gray-900">{section.title}</h4>
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-tl-gray-600">
                     {section.content}
                   </p>
                 </div>
               ))}
             </div>
-            <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
-              <p className="text-xs text-slate-400">
+            <div className="mt-4 flex items-center justify-between border-t border-tl-gray-100 pt-4">
+              <p className="text-xs text-tl-gray-400">
                 Proposed {document.generatedAt.toLocaleTimeString()}
                 {isApproved && ' · Approved by you'}
               </p>
@@ -149,7 +149,7 @@ export function DocumentPanel({
                   type="button"
                   onClick={onOrganize}
                   disabled={isOrganizing}
-                  className="flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-xl border border-tl-purple-200 bg-tl-purple-50 px-4 py-2 text-sm font-medium text-tl-purple-600 transition-colors hover:bg-tl-purple-100 disabled:opacity-50"
                 >
                   {isOrganizing ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

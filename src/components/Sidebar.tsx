@@ -9,8 +9,8 @@ import {
   Settings,
   Sparkles,
   Users,
-  Zap,
 } from 'lucide-react'
+import { Logo } from './Logo'
 
 type SidebarProps = {
   collapsed: boolean
@@ -34,18 +34,17 @@ const NAV_ITEMS = [
 export function Sidebar({ collapsed, activeItem, draftCount = 0, onToggle, onNavigate }: SidebarProps) {
   return (
     <aside
-      className={`flex h-full flex-col border-r border-slate-200 bg-white transition-all duration-200 ${
+      className={`glass-panel flex h-full flex-col border-r transition-all duration-300 ease-out ${
         collapsed ? 'w-[72px]' : 'w-60'
       }`}
     >
-      <div className={`flex items-center gap-3 p-5 ${collapsed ? 'justify-center px-3' : ''}`}>
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 shadow-sm">
-          <Zap className="h-5 w-5 text-white" fill="white" />
-        </div>
-        {!collapsed && (
-          <div className="min-w-0 text-left">
-            <p className="truncate text-sm font-bold text-slate-900">ThinkLoop</p>
-            <p className="truncate text-xs text-slate-500">AI Work Assistant</p>
+      <div className={`p-5 ${collapsed ? 'flex justify-center px-3' : ''}`}>
+        {collapsed ? (
+          <Logo variant="icon" />
+        ) : (
+          <div className="min-w-0">
+            <Logo variant="full" />
+            <p className="mt-2 truncate text-xs tracking-wide text-tl-gray-500">AI Work Assistant</p>
           </div>
         )}
       </div>
@@ -62,10 +61,10 @@ export function Sidebar({ collapsed, activeItem, draftCount = 0, onToggle, onNav
               type="button"
               onClick={() => onNavigate(item.id)}
               title={collapsed ? item.label : undefined}
-              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-tl-brand text-white shadow-tl-brand'
+                  : 'nav-item-idle'
               } ${collapsed ? 'justify-center px-2' : ''}`}
             >
               <Icon className="h-4 w-4 shrink-0" />
@@ -75,7 +74,7 @@ export function Sidebar({ collapsed, activeItem, draftCount = 0, onToggle, onNav
                   {badge !== undefined && badge > 0 && (
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs ${
-                        isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                        isActive ? 'bg-surface/20 text-white' : 'bg-tl-gray-100 text-tl-gray-600'
                       }`}
                     >
                       {badge}
@@ -88,14 +87,14 @@ export function Sidebar({ collapsed, activeItem, draftCount = 0, onToggle, onNav
         })}
       </nav>
 
-      <div className="border-t border-slate-100 p-3">
+      <div className="border-t border-tl-gray-200/60 p-3">
         <button
           type="button"
           onClick={() => onNavigate('settings')}
-          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
             activeItem === 'settings'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+              ? 'bg-tl-brand text-white shadow-tl-brand'
+              : 'nav-item-idle'
           } ${collapsed ? 'justify-center px-2' : ''}`}
         >
           <Settings className="h-4 w-4 shrink-0" />
@@ -105,11 +104,11 @@ export function Sidebar({ collapsed, activeItem, draftCount = 0, onToggle, onNav
         <button
           type="button"
           onClick={onToggle}
-          className="mt-2 flex w-full items-center justify-center rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-600"
+          className="mt-2 flex w-full items-center justify-center rounded-xl p-2 text-tl-gray-400 transition-all hover:bg-tl-gray-100 hover:text-tl-gray-600 dark:hover:bg-tl-gray-200/10"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           <ChevronLeft
-            className={`h-4 w-4 transition-transform ${collapsed ? 'rotate-180' : ''}`}
+            className={`h-4 w-4 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`}
           />
         </button>
       </div>

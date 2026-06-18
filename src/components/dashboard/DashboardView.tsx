@@ -12,7 +12,7 @@ export function DashboardView() {
       <section className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tl-cyan-100 text-tl-purple-600">
               <Icon name="lightbulb" size={16} />
             </div>
             <div>
@@ -24,7 +24,7 @@ export function DashboardView() {
           </div>
           <button
             type="button"
-            className="flex items-center gap-1.5 rounded-lg bg-tl-blue px-3.5 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="flex items-center gap-1.5 rounded-lg bg-tl-brand bg-tl-brand-hover px-3.5 py-2 text-sm font-medium text-white"
           >
             <Icon name="plus" size={16} />
             Add Idea

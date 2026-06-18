@@ -36,20 +36,20 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-slate-900/40 px-4 pt-[15vh] backdrop-blur-sm">
-      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-        <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
-          <Search className="h-4 w-4 text-slate-400" />
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 px-4 pt-[15vh] backdrop-blur-md dark:bg-black/70">
+      <div className="glass-panel w-full max-w-lg overflow-hidden rounded-2xl border shadow-2xl">
+        <div className="flex items-center gap-3 border-b border-tl-gray-200/60 px-4 py-3">
+          <Search className="h-4 w-4 text-tl-gray-400" />
           <input
             ref={inputRef}
             type="search"
             placeholder="Search ideas, drafts, summaries…"
-            className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+            className="flex-1 bg-transparent text-sm text-tl-gray-800 outline-none placeholder:text-tl-gray-400"
           />
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-lg p-1.5 text-tl-gray-400 transition-colors hover:bg-tl-gray-100 hover:text-tl-gray-600 dark:hover:bg-tl-gray-200/10"
             aria-label="Close search"
           >
             <X className="h-4 w-4" />
@@ -61,14 +61,14 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
             <button
               key={item.title}
               type="button"
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-slate-50"
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-tl-gray-100/80 dark:hover:bg-tl-gray-200/10"
             >
-              <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">
+              <span className="rounded-md bg-tl-gray-100 px-2 py-0.5 text-[10px] font-medium text-tl-gray-500">
                 {item.type}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm text-slate-700">{item.title}</p>
-                <p className="text-xs text-slate-400">{item.section}</p>
+                <p className="truncate text-sm text-tl-gray-700">{item.title}</p>
+                <p className="text-xs text-tl-gray-400">{item.section}</p>
               </div>
             </button>
           ))}

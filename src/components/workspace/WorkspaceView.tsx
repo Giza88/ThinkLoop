@@ -42,9 +42,9 @@ export function WorkspaceView() {
       </div>
 
       <div className="flex flex-1 gap-5 overflow-hidden">
-        <section className="flex min-w-0 flex-1 flex-col rounded-2xl border border-tl-gray-200 bg-white p-5">
+        <section className="flex min-w-0 flex-1 flex-col rounded-2xl border border-tl-gray-200 bg-surface p-5">
           <div className="mb-4 flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-tl-cyan-100 text-tl-purple-600">
               <Icon name="lightbulb" size={14} />
             </div>
             <div>
@@ -65,7 +65,7 @@ export function WorkspaceView() {
             <button
               type="button"
               onClick={nextPrompt}
-              className="mt-3 flex items-center gap-1.5 rounded-lg border border-tl-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-tl-gray-600 hover:bg-tl-gray-50"
+              className="mt-3 flex items-center gap-1.5 rounded-lg border border-tl-gray-200 bg-surface px-3 py-1.5 text-xs font-medium text-tl-gray-600 hover:bg-tl-gray-50"
             >
               Next
               <Icon name="refresh" size={12} />
@@ -80,7 +80,7 @@ export function WorkspaceView() {
           />
         </section>
 
-        <section className="flex w-[42%] shrink-0 flex-col rounded-2xl border border-tl-gray-200 bg-white">
+        <section className="flex w-[42%] shrink-0 flex-col rounded-2xl border border-tl-gray-200 bg-surface">
           <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-tl-gray-100 text-tl-gray-400">
               <Icon name="fileText" size={32} />
@@ -107,9 +107,9 @@ interface ProcessStepProps {
 }
 
 const stepColors = {
-  yellow: 'bg-amber-100 text-amber-700',
-  blue: 'bg-blue-100 text-tl-blue',
-  green: 'bg-green-100 text-green-600',
+  yellow: 'bg-tl-cyan-100 text-tl-cyan-600',
+  blue: 'bg-tl-purple-100 text-tl-blue',
+  green: 'bg-tl-cyan-100 text-tl-cyan-500',
 }
 
 function ProcessStep({ number, color, title, subtitle }: ProcessStepProps) {

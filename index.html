@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/thinkloop-logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ThinkLoop — AI Work Assistant</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -11,6 +11,18 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <script>
+      ;(function () {
+        try {
+          var stored = localStorage.getItem('thinkloop:theme')
+          var theme = stored ? JSON.parse(stored) : 'dark'
+          var dark =
+            theme === 'dark' ||
+            (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          if (dark) document.documentElement.classList.add('dark')
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

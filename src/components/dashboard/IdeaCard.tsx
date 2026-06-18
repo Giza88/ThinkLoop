@@ -6,24 +6,24 @@ const colorStyles: Record<
   { card: string; tag: string; tagText: string }
 > = {
   blue: {
-    card: 'bg-blue-50/80 border-blue-100',
-    tag: 'border-blue-200 bg-blue-50',
-    tagText: 'text-blue-600',
+    card: 'bg-tl-purple-50/80 border-tl-purple-100',
+    tag: 'border-tl-purple-200 bg-tl-purple-50',
+    tagText: 'text-tl-purple-500',
   },
   green: {
-    card: 'bg-green-50/80 border-green-100',
-    tag: 'border-green-200 bg-green-50',
-    tagText: 'text-green-600',
+    card: 'bg-tl-cyan-50/80 border-tl-cyan-100',
+    tag: 'border-tl-cyan-200 bg-tl-cyan-50',
+    tagText: 'text-tl-cyan-500',
   },
   yellow: {
-    card: 'bg-amber-50/80 border-amber-100',
-    tag: 'border-amber-200 bg-amber-50',
-    tagText: 'text-amber-700',
+    card: 'bg-tl-purple-50/80 border-tl-purple-100',
+    tag: 'border-tl-cyan-200 bg-tl-purple-50',
+    tagText: 'text-tl-cyan-600',
   },
   purple: {
-    card: 'bg-purple-50/80 border-purple-100',
-    tag: 'border-purple-200 bg-purple-50',
-    tagText: 'text-purple-600',
+    card: 'bg-tl-purple-50/80 border-tl-purple-100',
+    tag: 'border-tl-purple-200 bg-tl-purple-50',
+    tagText: 'text-tl-purple-500',
   },
 }
 

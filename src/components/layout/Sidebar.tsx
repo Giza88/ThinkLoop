@@ -1,4 +1,5 @@
 import { Icon } from '../Icon'
+import { Logo } from '../Logo'
 import { navItems, type NavItem } from '../../data/content'
 
 interface SidebarProps {
@@ -8,15 +9,10 @@ interface SidebarProps {
 
 export function Sidebar({ active, onNavigate }: SidebarProps) {
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-tl-gray-200 bg-white">
-      <div className="flex items-center gap-2.5 px-5 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-tl-teal text-white">
-          <Icon name="zap" size={18} />
-        </div>
-        <div className="text-left">
-          <div className="text-sm font-bold text-tl-gray-900">ThinkLoop</div>
-          <div className="text-[11px] text-tl-gray-500">AI Work Assistant</div>
-        </div>
+    <aside className="flex w-56 shrink-0 flex-col border-r border-tl-gray-200 bg-surface">
+      <div className="px-5 py-5">
+        <Logo variant="full" className="max-w-[132px]" />
+        <div className="mt-2 text-[11px] text-tl-gray-500">AI Work Assistant</div>
       </div>
 
       <nav className="flex flex-1 flex-col gap-0.5 px-3">
@@ -29,7 +25,7 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
               onClick={() => onNavigate(item.id)}
               className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${
                 isActive
-                  ? 'bg-tl-blue font-medium text-white'
+                  ? 'bg-tl-brand font-medium text-white shadow-sm shadow-tl-brand'
                   : 'text-tl-gray-500 hover:bg-tl-gray-100 hover:text-tl-gray-700'
               }`}
             >
@@ -46,7 +42,7 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
           onClick={() => onNavigate('settings')}
           className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${
             active === 'settings'
-              ? 'bg-tl-blue font-medium text-white'
+              ? 'bg-tl-brand font-medium text-white shadow-sm shadow-tl-brand'
               : 'text-tl-gray-500 hover:bg-tl-gray-100 hover:text-tl-gray-700'
           }`}
         >

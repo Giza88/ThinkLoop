@@ -45,22 +45,22 @@ export function BrainstormBoard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Brainstorm Board</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <h1 className="text-2xl font-bold text-tl-gray-900">Brainstorm Board</h1>
+        <p className="mt-1 text-sm text-tl-gray-500">
           Capture and organize ideas before you develop them in the workspace.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="tl-card p-5">
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">Your ideas</h3>
-            <p className="text-xs text-slate-500">{ideas.length} ideas</p>
+            <h3 className="text-sm font-semibold text-tl-gray-900">Your ideas</h3>
+            <p className="text-xs text-tl-gray-500">{ideas.length} ideas</p>
           </div>
           <button
             type="button"
             onClick={() => setShowForm((open) => !open)}
-            className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="flex items-center gap-1.5 rounded-xl bg-tl-brand bg-tl-brand-hover px-4 py-2 text-sm font-medium text-white transition-colors "
           >
             {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
             {showForm ? 'Cancel' : 'Add Idea'}
@@ -68,21 +68,21 @@ export function BrainstormBoard() {
         </div>
 
         {showForm && (
-          <div className="mb-5 rounded-xl border border-blue-100 bg-blue-50/50 p-4">
+          <div className="mb-5 rounded-xl border border-tl-purple-100 bg-tl-purple-50/50 p-4">
             <div className="space-y-3">
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Idea title"
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+                className="w-full rounded-xl border border-tl-gray-200 bg-surface px-4 py-2.5 text-sm text-tl-gray-700 outline-none focus:border-tl-cyan-300 focus:ring-2 focus:ring-tl-purple-100"
               />
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe the idea..."
                 rows={3}
-                className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+                className="w-full resize-none rounded-xl border border-tl-gray-200 bg-surface px-4 py-2.5 text-sm text-tl-gray-700 outline-none focus:border-tl-cyan-300 focus:ring-2 focus:ring-tl-purple-100"
               />
               <div className="flex flex-wrap gap-1.5">
                 {TAG_OPTIONS.map((tag) => (
@@ -92,8 +92,8 @@ export function BrainstormBoard() {
                     onClick={() => toggleTag(tag)}
                     className={`rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors ${
                       selectedTags.includes(tag)
-                        ? 'border-blue-300 bg-blue-100 text-blue-700'
-                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                        ? 'border-tl-cyan-300 bg-tl-purple-100 text-tl-purple-600'
+                        : 'border-tl-gray-200 bg-surface text-tl-gray-600 hover:border-tl-gray-300'
                     }`}
                   >
                     {tag}
@@ -104,7 +104,7 @@ export function BrainstormBoard() {
                 type="button"
                 onClick={handleAddIdea}
                 disabled={!title.trim() || !description.trim()}
-                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl bg-tl-brand bg-tl-brand-hover px-4 py-2 text-sm font-medium text-white  disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Save idea
               </button>
@@ -116,16 +116,16 @@ export function BrainstormBoard() {
           {ideas.map((idea) => (
             <div
               key={idea.id}
-              className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 transition-colors hover:border-blue-200 hover:bg-white"
+              className="rounded-xl border border-tl-gray-100 bg-tl-gray-50/50 p-4 transition-colors hover:border-tl-purple-200 hover:bg-surface-raised"
             >
-              <h4 className="text-sm font-semibold text-slate-900">{idea.title}</h4>
-              <p className="mt-2 text-xs leading-relaxed text-slate-500">{idea.description}</p>
+              <h4 className="text-sm font-semibold text-tl-gray-900">{idea.title}</h4>
+              <p className="mt-2 text-xs leading-relaxed text-tl-gray-500">{idea.description}</p>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {idea.tags.map((tag) => (
                   <span
                     key={tag}
                     className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${
-                      TAG_COLORS[tag] ?? 'bg-slate-100 text-slate-600 border-slate-200'
+                      TAG_COLORS[tag] ?? 'bg-tl-gray-100 text-tl-gray-600 border-tl-gray-200'
                     }`}
                   >
                     {tag}

@@ -3,6 +3,9 @@ import type { Draft, HistoryEntry } from '../types'
 const DRAFTS_KEY = 'thinkloop:drafts'
 const HISTORY_KEY = 'thinkloop:history'
 const INTEGRATIONS_KEY = 'thinkloop:integrations'
+const THEME_KEY = 'thinkloop:theme'
+
+export type Theme = 'light' | 'dark' | 'system'
 
 function readJson<T>(key: string, fallback: T): T {
   try {
@@ -40,4 +43,16 @@ export function loadConnectedIntegrations(): string[] {
 
 export function saveConnectedIntegrations(ids: string[]) {
   writeJson(INTEGRATIONS_KEY, ids)
+}
+
+export function loadTheme(): Theme {
+  const stored = readJson<Theme | null>(THEME_KEY, null)
+  if (stored === 'light' || stored === 'dark' || stored === 'system') {
+    return stored
+  }
+  return 'dark'
+}
+
+export function saveTheme(theme: Theme) {
+  writeJson(THEME_KEY, theme)
 }

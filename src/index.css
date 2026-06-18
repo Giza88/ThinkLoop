@@ -1,12 +1,137 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --color-thinkloop-50: #f0f9ff;
-  --color-thinkloop-100: #e0f2fe;
-  --color-thinkloop-500: #0ea5e9;
-  --color-thinkloop-600: #0284c7;
-  --color-thinkloop-700: #0369a1;
+
+  /* Theme-aware palette (values set on :root / .dark) */
+  --color-tl-cyan-50: var(--tl-cyan-50);
+  --color-tl-cyan-100: var(--tl-cyan-100);
+  --color-tl-cyan-200: var(--tl-cyan-200);
+  --color-tl-cyan-300: var(--tl-cyan-300);
+  --color-tl-cyan-400: var(--tl-cyan-400);
+  --color-tl-cyan-500: var(--tl-cyan-500);
+  --color-tl-cyan-600: var(--tl-cyan-600);
+
+  --color-tl-purple-50: var(--tl-purple-50);
+  --color-tl-purple-100: var(--tl-purple-100);
+  --color-tl-purple-200: var(--tl-purple-200);
+  --color-tl-purple-300: var(--tl-purple-300);
+  --color-tl-purple-400: var(--tl-purple-400);
+  --color-tl-purple-500: var(--tl-purple-500);
+  --color-tl-purple-600: var(--tl-purple-600);
+  --color-tl-purple-700: var(--tl-purple-700);
+  --color-tl-purple-800: var(--tl-purple-800);
+
+  --color-tl-gray-50: var(--tl-gray-50);
+  --color-tl-gray-100: var(--tl-gray-100);
+  --color-tl-gray-200: var(--tl-gray-200);
+  --color-tl-gray-300: var(--tl-gray-300);
+  --color-tl-gray-400: var(--tl-gray-400);
+  --color-tl-gray-500: var(--tl-gray-500);
+  --color-tl-gray-600: var(--tl-gray-600);
+  --color-tl-gray-700: var(--tl-gray-700);
+  --color-tl-gray-800: var(--tl-gray-800);
+  --color-tl-gray-900: var(--tl-gray-900);
+
+  --color-tl-blue: var(--tl-blue);
+  --color-tl-blue-light: var(--tl-blue-light);
+  --color-tl-black: #000000;
+
+  --color-surface: var(--tl-surface);
+  --color-surface-raised: var(--tl-surface-raised);
+  --color-surface-muted: var(--tl-surface-muted);
+}
+
+:root {
+  color-scheme: light;
+
+  --tl-cyan-50: #ecfbff;
+  --tl-cyan-100: #d6f3ff;
+  --tl-cyan-200: #a8e4ff;
+  --tl-cyan-300: #6dd0ff;
+  --tl-cyan-400: #47bfff;
+  --tl-cyan-500: #22a8f0;
+  --tl-cyan-600: #0d8fd4;
+
+  --tl-purple-50: #f3eeff;
+  --tl-purple-100: #e4d4ff;
+  --tl-purple-200: #c9a8ff;
+  --tl-purple-300: #a970ff;
+  --tl-purple-400: #863bff;
+  --tl-purple-500: #7e14ff;
+  --tl-purple-600: #6b0fd9;
+  --tl-purple-700: #5a0bb8;
+  --tl-purple-800: #480a96;
+
+  --tl-gray-50: #f8fafc;
+  --tl-gray-100: #f1f5f9;
+  --tl-gray-200: #e2e8f0;
+  --tl-gray-300: #cbd5e1;
+  --tl-gray-400: #94a3b8;
+  --tl-gray-500: #64748b;
+  --tl-gray-600: #475569;
+  --tl-gray-700: #334155;
+  --tl-gray-800: #1e293b;
+  --tl-gray-900: #0f172a;
+
+  --tl-blue: #47bfff;
+  --tl-blue-light: #eef4ff;
+
+  --tl-surface: #ffffff;
+  --tl-surface-raised: #ffffff;
+  --tl-surface-muted: #f8fafc;
+
+  --tl-glass: rgba(255, 255, 255, 0.72);
+  --tl-glass-border: rgba(226, 232, 240, 0.8);
+  --tl-shadow-soft: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 32px -8px rgba(134, 59, 255, 0.12);
+  --tl-shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 4px 24px -6px rgba(15, 23, 42, 0.08);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --tl-cyan-50: #071a28;
+  --tl-cyan-100: #0c2438;
+  --tl-cyan-200: #123550;
+  --tl-cyan-300: #1a4f75;
+  --tl-cyan-400: #47bfff;
+  --tl-cyan-500: #5cc8ff;
+  --tl-cyan-600: #7dd4ff;
+
+  --tl-purple-50: #120a28;
+  --tl-purple-100: #1a1040;
+  --tl-purple-200: #2a1860;
+  --tl-purple-300: #4a28a0;
+  --tl-purple-400: #863bff;
+  --tl-purple-500: #9b5cff;
+  --tl-purple-600: #b07dff;
+  --tl-purple-700: #c9a8ff;
+  --tl-purple-800: #e4d4ff;
+
+  --tl-gray-50: #06060c;
+  --tl-gray-100: #0c0c14;
+  --tl-gray-200: #16161f;
+  --tl-gray-300: #242432;
+  --tl-gray-400: #5c5c70;
+  --tl-gray-500: #8888a0;
+  --tl-gray-600: #b0b0c0;
+  --tl-gray-700: #d0d0dc;
+  --tl-gray-800: #e8e8f0;
+  --tl-gray-900: #f8f8fc;
+
+  --tl-blue: #47bfff;
+  --tl-blue-light: #0f1a2e;
+
+  --tl-surface: #101018;
+  --tl-surface-raised: #181824;
+  --tl-surface-muted: #0a0a12;
+
+  --tl-glass: rgba(16, 16, 24, 0.78);
+  --tl-glass-border: rgba(255, 255, 255, 0.06);
+  --tl-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 32px -8px rgba(134, 59, 255, 0.25);
+  --tl-shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 32px -8px rgba(0, 0, 0, 0.5);
 }
 
 @layer base {
@@ -14,7 +139,15 @@
     box-sizing: border-box;
   }
 
-  html,
+  html {
+    height: 100%;
+    margin: 0;
+  }
+
+  html.dark {
+    background-color: var(--tl-gray-50);
+  }
+
   body,
   #root {
     height: 100%;
@@ -25,5 +158,100 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: var(--tl-gray-50);
+    color: var(--tl-gray-900);
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+}
+
+@layer utilities {
+  .bg-tl-brand {
+    background-image: linear-gradient(135deg, var(--tl-cyan-400) 0%, var(--tl-purple-400) 100%);
+  }
+
+  .bg-tl-brand-hover:hover {
+    background-image: linear-gradient(135deg, var(--tl-cyan-500) 0%, var(--tl-purple-500) 100%);
+  }
+
+  .bg-tl-brand-subtle {
+    background-color: var(--tl-gray-50);
+    background-image:
+      radial-gradient(ellipse 90% 60% at 0% -10%, color-mix(in srgb, var(--tl-cyan-400) 14%, transparent), transparent 55%),
+      radial-gradient(ellipse 70% 50% at 100% 0%, color-mix(in srgb, var(--tl-purple-400) 12%, transparent), transparent 50%),
+      radial-gradient(ellipse 50% 40% at 50% 100%, color-mix(in srgb, var(--tl-purple-400) 6%, transparent), transparent 60%);
+  }
+
+  .bg-tl-mesh {
+    background-color: var(--tl-gray-50);
+    background-image:
+      radial-gradient(ellipse 100% 80% at 10% -20%, color-mix(in srgb, var(--tl-cyan-400) 16%, transparent), transparent 50%),
+      radial-gradient(ellipse 80% 60% at 95% 5%, color-mix(in srgb, var(--tl-purple-400) 14%, transparent), transparent 45%),
+      radial-gradient(ellipse 60% 50% at 50% 110%, color-mix(in srgb, var(--tl-purple-400) 8%, transparent), transparent 55%);
+  }
+
+  .glass-panel {
+    background: var(--tl-glass);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    border-color: var(--tl-glass-border);
+    box-shadow: var(--tl-shadow-panel);
+  }
+
+  .tl-card {
+    border-radius: 1rem;
+    border: 1px solid color-mix(in srgb, var(--tl-gray-200) 80%, transparent);
+    background-color: var(--tl-surface);
+    box-shadow: var(--tl-shadow-soft);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease;
+  }
+
+  .tl-card:hover {
+    border-color: color-mix(in srgb, var(--tl-purple-200) 60%, var(--tl-gray-200));
+    box-shadow:
+      var(--tl-shadow-soft),
+      0 0 0 1px color-mix(in srgb, var(--tl-purple-400) 8%, transparent);
+  }
+
+  .tl-input {
+    border-radius: 0.875rem;
+    border: 1px solid var(--tl-gray-200);
+    background-color: var(--tl-surface-muted);
+    color: var(--tl-gray-800);
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+
+  .tl-input::placeholder {
+    color: var(--tl-gray-400);
+  }
+
+  .tl-input:focus {
+    border-color: var(--tl-cyan-400);
+    background-color: var(--tl-surface-raised);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tl-purple-400) 18%, transparent);
+  }
+
+  .border-tl-brand {
+    border-color: var(--tl-purple-200);
+  }
+
+  .text-tl-brand {
+    background-image: linear-gradient(135deg, var(--tl-cyan-500) 0%, var(--tl-purple-500) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .shadow-tl-brand {
+    box-shadow: 0 4px 14px -2px color-mix(in srgb, var(--tl-purple-400) 30%, transparent);
+  }
+
+  .nav-item-idle {
+    color: var(--tl-gray-600);
+  }
+
+  .nav-item-idle:hover {
+    background-color: color-mix(in srgb, var(--tl-gray-100) 80%, transparent);
+    color: var(--tl-gray-900);
   }
 }

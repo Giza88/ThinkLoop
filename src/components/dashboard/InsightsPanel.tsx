@@ -3,10 +3,10 @@ import { metrics, weeklyActivity } from '../../data/content'
 import { Icon } from '../Icon'
 
 const metricColors = {
-  blue: { text: 'text-blue-600', bg: 'bg-blue-50' },
-  green: { text: 'text-green-600', bg: 'bg-green-50' },
-  purple: { text: 'text-purple-600', bg: 'bg-purple-50' },
-  orange: { text: 'text-orange-600', bg: 'bg-orange-50' },
+  blue: { text: 'text-tl-purple-500', bg: 'bg-tl-purple-50' },
+  green: { text: 'text-tl-cyan-500', bg: 'bg-tl-cyan-50' },
+  purple: { text: 'text-tl-purple-600', bg: 'bg-tl-purple-50' },
+  orange: { text: 'text-tl-cyan-600', bg: 'bg-tl-cyan-50' },
 }
 
 export function InsightsPanel() {
@@ -14,10 +14,10 @@ export function InsightsPanel() {
   const maxValue = Math.max(...weeklyActivity.map((d) => d.value))
 
   return (
-    <aside className="flex w-80 shrink-0 flex-col overflow-hidden rounded-2xl border border-tl-gray-200 bg-white">
+    <aside className="flex w-80 shrink-0 flex-col overflow-hidden rounded-2xl border border-tl-gray-200 bg-surface">
       <div className="border-b border-tl-gray-100 px-5 py-4">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-tl-blue">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tl-purple-100 text-tl-blue">
             <Icon name="barChart" size={16} />
           </div>
           <h2 className="text-base font-semibold text-tl-gray-900">
@@ -31,7 +31,7 @@ export function InsightsPanel() {
             onClick={() => setTab('stats')}
             className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-colors ${
               tab === 'stats'
-                ? 'bg-white text-tl-blue shadow-sm'
+                ? 'bg-surface text-tl-purple-500 shadow-sm'
                 : 'text-tl-gray-500'
             }`}
           >
@@ -42,7 +42,7 @@ export function InsightsPanel() {
             onClick={() => setTab('feedback')}
             className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-colors ${
               tab === 'feedback'
-                ? 'bg-white text-tl-blue shadow-sm'
+                ? 'bg-surface text-tl-purple-500 shadow-sm'
                 : 'text-tl-gray-500'
             }`}
           >
@@ -97,7 +97,7 @@ export function InsightsPanel() {
                       <div className="flex w-full flex-1 items-end">
                         <div
                           className={`w-full rounded-t-md transition-all ${
-                            isPeak ? 'bg-tl-blue' : 'bg-blue-200'
+                            isPeak ? 'bg-tl-brand' : 'bg-tl-purple-200'
                           }`}
                           style={{ height: `${height}%` }}
                         />

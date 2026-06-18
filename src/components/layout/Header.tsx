@@ -2,7 +2,7 @@ import { Icon } from '../Icon'
 
 export function Header() {
   return (
-    <header className="flex items-center gap-4 border-b border-tl-gray-200 bg-white px-6 py-3">
+    <header className="flex items-center gap-4 border-b border-tl-gray-200 bg-surface px-6 py-3">
       <div className="relative flex-1">
         <Icon
           name="search"
@@ -12,15 +12,15 @@ export function Header() {
         <input
           type="search"
           placeholder="Search ideas, drafts, summaries"
-          className="w-full rounded-xl border border-tl-gray-200 bg-tl-gray-50 py-2.5 pl-10 pr-16 text-sm text-tl-gray-700 outline-none placeholder:text-tl-gray-400 focus:border-tl-blue focus:ring-1 focus:ring-tl-blue"
+          className="w-full rounded-xl border border-tl-gray-200 bg-tl-gray-50 py-2.5 pl-10 pr-16 text-sm text-tl-gray-700 outline-none placeholder:text-tl-gray-400 focus:border-tl-cyan-400 focus:ring-1 focus:ring-tl-purple-400"
         />
-        <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded border border-tl-gray-200 bg-white px-1.5 py-0.5 text-[10px] text-tl-gray-400">
+        <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded border border-tl-gray-200 bg-surface px-1.5 py-0.5 text-[10px] text-tl-gray-400">
           ⌘K
         </kbd>
       </div>
 
-      <div className="flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700">
-        <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+      <div className="flex items-center gap-1.5 rounded-full border border-tl-cyan-200 bg-tl-cyan-50 px-3 py-1.5 text-xs font-medium text-tl-cyan-600">
+        <span className="h-1.5 w-1.5 rounded-full bg-tl-cyan-500" />
         Human-led · AI-assisted
       </div>
 
@@ -38,14 +38,14 @@ export function Header() {
         aria-label="Notifications"
       >
         <Icon name="bell" size={18} />
-        <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-green-500" />
+        <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-tl-cyan-500" />
       </button>
 
       <button
         type="button"
         className="flex items-center gap-2 rounded-lg py-1 pl-1 pr-2 hover:bg-tl-gray-100"
       >
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tl-blue text-xs font-semibold text-white">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tl-brand text-xs font-semibold text-white">
           AM
         </div>
         <span className="text-sm font-medium text-tl-gray-700">Alex Morgan</span>

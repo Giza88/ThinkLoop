@@ -5,7 +5,7 @@ const STEPS = [
     number: 1,
     title: 'Connect tools',
     description: 'Sign in to Microsoft, Slack, GitHub…',
-    color: 'bg-violet-100 text-violet-700 ring-violet-200',
+    color: 'bg-tl-purple-100 text-tl-purple-600 ring-tl-purple-200',
     icon: Link2,
     actor: 'you' as const,
   },
@@ -13,7 +13,7 @@ const STEPS = [
     number: 2,
     title: 'You think it',
     description: 'Capture raw thoughts and goals',
-    color: 'bg-amber-100 text-amber-700 ring-amber-200',
+    color: 'bg-tl-cyan-100 text-tl-cyan-600 ring-tl-cyan-200',
     icon: User,
     actor: 'you' as const,
   },
@@ -21,7 +21,7 @@ const STEPS = [
     number: 3,
     title: 'AI proposes',
     description: 'Structures drafts from your input + connected context',
-    color: 'bg-blue-100 text-blue-700 ring-blue-200',
+    color: 'bg-tl-purple-100 text-tl-purple-600 ring-tl-purple-200',
     icon: Sparkles,
     actor: 'agent' as const,
   },
@@ -29,7 +29,7 @@ const STEPS = [
     number: 4,
     title: 'You review it',
     description: 'Edit every section before anything moves',
-    color: 'bg-amber-100 text-amber-700 ring-amber-200',
+    color: 'bg-tl-cyan-100 text-tl-cyan-600 ring-tl-cyan-200',
     icon: Pencil,
     actor: 'you' as const,
   },
@@ -37,7 +37,7 @@ const STEPS = [
     number: 5,
     title: 'You approve it',
     description: 'Export, send, or post — only after you say yes',
-    color: 'bg-emerald-100 text-emerald-700 ring-emerald-200',
+    color: 'bg-tl-cyan-100 text-tl-cyan-600 ring-tl-cyan-200',
     icon: CheckCircle2,
     actor: 'you' as const,
   },
@@ -45,12 +45,12 @@ const STEPS = [
 
 export function ProcessSteps() {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="tl-card p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        <p className="text-xs font-semibold uppercase tracking-wide text-tl-gray-400">
           The human-in-the-loop loop
         </p>
-        <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-medium text-emerald-700">
+        <span className="rounded-full border border-tl-cyan-200 bg-tl-cyan-50 px-2.5 py-0.5 text-[10px] font-medium text-tl-cyan-600">
           4 of 5 steps need you
         </span>
       </div>
@@ -65,11 +65,11 @@ export function ProcessSteps() {
                 <Icon className="h-3.5 w-3.5" />
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-tl-gray-400">
                   {step.actor === 'you' ? 'You' : 'Agent'}
                 </p>
-                <p className="text-sm font-semibold text-slate-900">{step.title}</p>
-                <p className="text-xs text-slate-500">{step.description}</p>
+                <p className="text-sm font-semibold text-tl-gray-900">{step.title}</p>
+                <p className="text-xs text-tl-gray-500">{step.description}</p>
               </div>
             </div>
           )

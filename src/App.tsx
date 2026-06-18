@@ -237,13 +237,13 @@ function App() {
         return (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">ThinkLoop Workspace</h1>
-              <p className="mt-1 text-sm text-slate-500">
+              <h1 className="text-2xl font-bold text-tl-gray-900">ThinkLoop Workspace</h1>
+              <p className="mt-1 text-sm text-tl-gray-500">
                 Your ideas drive everything. The agent proposes — you review and approve before
                 anything is saved or exported.
               </p>
               {connectedIntegrations.length > 0 && (
-                <p className="mt-2 text-xs text-emerald-700">
+                <p className="mt-2 text-xs text-tl-cyan-600">
                   Reading context from {connectedIntegrations.length} connected tool
                   {connectedIntegrations.length !== 1 ? 's' : ''}. Outbound actions still need
                   your approval.
@@ -341,7 +341,7 @@ function App() {
   }
 
   return (
-    <div className="flex h-full bg-slate-50">
+    <div className="flex h-full bg-tl-mesh">
       <Sidebar
         collapsed={sidebarCollapsed}
         activeItem={activeNav}
@@ -352,7 +352,7 @@ function App() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Header onSearchFocus={() => setSearchOpen(true)} />
-        <main className="flex-1 overflow-y-auto p-6">{renderContent()}</main>
+        <main className="flex-1 overflow-y-auto p-6 md:p-8">{renderContent()}</main>
       </div>
 
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />

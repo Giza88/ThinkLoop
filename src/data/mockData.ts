@@ -75,12 +75,12 @@ export const WEEKLY_ACTIVITY: WeeklyActivity[] = [
 ]
 
 export const TAG_COLORS: Record<string, string> = {
-  Product: 'bg-blue-50 text-blue-700 border-blue-100',
-  UX: 'bg-violet-50 text-violet-700 border-violet-100',
-  Marketing: 'bg-amber-50 text-amber-700 border-amber-100',
-  Automation: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-  PM: 'bg-rose-50 text-rose-700 border-rose-100',
-  Engineering: 'bg-slate-100 text-slate-700 border-slate-200',
-  Strategy: 'bg-indigo-50 text-indigo-700 border-indigo-100',
-  Research: 'bg-cyan-50 text-cyan-700 border-cyan-100',
+  Product: 'bg-tl-purple-50 text-tl-purple-600 border-tl-purple-100',
+  UX: 'bg-tl-purple-50 text-tl-purple-600 border-tl-purple-200',
+  Marketing: 'bg-tl-cyan-50 text-tl-cyan-600 border-tl-cyan-200',
+  Automation: 'bg-tl-cyan-50 text-tl-cyan-600 border-tl-cyan-100',
+  PM: 'bg-tl-purple-100 text-tl-purple-700 border-tl-purple-200',
+  Engineering: 'bg-tl-gray-100 text-tl-gray-700 border-tl-gray-200',
+  Strategy: 'bg-tl-purple-50 text-tl-purple-500 border-tl-purple-100',
+  Research: 'bg-tl-cyan-50 text-tl-cyan-500 border-tl-cyan-100',
 }

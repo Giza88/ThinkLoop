@@ -13,7 +13,7 @@ export const INTEGRATION_PROVIDERS: IntegrationProvider[] = [
     name: 'Microsoft 365',
     description: 'Outlook, Teams, SharePoint, OneDrive',
     category: 'productivity',
-    color: 'bg-blue-600',
+    color: 'bg-tl-brand',
     initials: 'MS',
   },
   {
@@ -29,7 +29,7 @@ export const INTEGRATION_PROVIDERS: IntegrationProvider[] = [
     name: 'Slack',
     description: 'Channels, threads, and team context',
     category: 'communication',
-    color: 'bg-purple-600',
+    color: 'bg-tl-purple-500',
     initials: 'Sl',
   },
   {
@@ -37,7 +37,7 @@ export const INTEGRATION_PROVIDERS: IntegrationProvider[] = [
     name: 'GitHub',
     description: 'Repos, PRs, issues, and commits',
     category: 'development',
-    color: 'bg-slate-800',
+    color: 'bg-tl-gray-800',
     initials: 'GH',
   },
   {
@@ -45,7 +45,7 @@ export const INTEGRATION_PROVIDERS: IntegrationProvider[] = [
     name: 'Linear',
     description: 'Issues, cycles, and project updates',
     category: 'development',
-    color: 'bg-indigo-600',
+    color: 'bg-tl-purple-600',
     initials: 'Li',
   },
   {
@@ -53,7 +53,7 @@ export const INTEGRATION_PROVIDERS: IntegrationProvider[] = [
     name: 'Notion',
     description: 'Pages, databases, and wikis',
     category: 'storage',
-    color: 'bg-slate-900',
+    color: 'bg-tl-gray-900',
     initials: 'N',
   },
 ]
