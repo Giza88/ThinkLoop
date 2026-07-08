@@ -23,6 +23,7 @@ import type {
   HistoryEntry,
   StructuredDocument,
   Thought,
+  UserProfile,
 } from './types'
 
 function documentToMarkdown(doc: StructuredDocument): string {
@@ -50,6 +51,11 @@ export default function App() {
   const [showPrompts, setShowPrompts] = useState(true)
   const [requireApproval, setRequireApproval] = useState(true)
   const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [user, setUser] = useState<UserProfile>({
+    displayName: null,
+    email: null,
+    firstName: null,
+  })
 
   const saveWorkspaceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const saveErrorShown = useRef(false)
@@ -88,7 +94,7 @@ export default function App() {
     async function bootstrap() {
       try {
         await migrateLocalStorageIfNeeded()
-        const [settings, workspace, draftsData, historyData, integrationsData, statsData] =
+        const [settings, workspace, draftsData, historyData, integrationsData, statsData, userData] =
           await Promise.all([
             api.getSettings(),
             api.getWorkspace(),
@@ -96,6 +102,7 @@ export default function App() {
             api.getHistory(),
             api.getIntegrations(),
             api.getStats(),
+            api.getUser(),
           ])
 
         setAutoSaveDrafts(settings.autoSaveDrafts)
@@ -108,6 +115,7 @@ export default function App() {
         setHistory(historyData)
         setConnectedIntegrations(integrationsData.connected)
         setStats(statsData)
+        setUser(userData)
       } catch (err) {
         toast.error(
           getErrorMessage(err, 'Could not connect to the API. Run npm run dev to start the server.'),
@@ -120,11 +128,16 @@ export default function App() {
   }, [])
 
   const handleConnectIntegration = useCallback(
-    async (providerId: string) => {
+    async (providerId: string, account?: { email?: string }) => {
       try {
-        const { connected } = await api.connectIntegration(providerId)
+        const { connected, user: nextUser } = await api.connectIntegration(providerId, account)
         setConnectedIntegrations(connected)
-        toast.success('Integration connected')
+        setUser(nextUser)
+        toast.success(
+          nextUser.firstName
+            ? `Connected — signed in as ${nextUser.displayName}`
+            : 'Integration connected',
+        )
       } catch (err) {
         toast.error(getErrorMessage(err, 'Could not connect integration'))
       }
@@ -306,6 +319,7 @@ export default function App() {
       case 'dashboard':
         return (
           <DashboardHome
+            user={user}
             connectedIntegrations={connectedIntegrations}
             stats={stats}
             onNavigate={setActiveNav}
@@ -358,7 +372,7 @@ export default function App() {
         )
 
       case 'email-reply':
-        return <EmailReplyView outlookConnected={connectedIntegrations.includes('microsoft')} />
+        return <EmailReplyView outlookConnected={connectedIntegrations.includes('microsoft')} user={user} />
 
       case 'brainstorm':
         return <BrainstormBoard />
@@ -435,7 +449,7 @@ export default function App() {
       />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <Header onSearchFocus={() => setSearchOpen(true)} />
+        <Header user={user} onSearchFocus={() => setSearchOpen(true)} />
         <main className="flex-1 overflow-y-auto p-6 md:p-8">{renderContent()}</main>
       </div>
 

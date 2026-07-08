@@ -10,6 +10,7 @@ import type {
   SearchResult,
   StructuredDocument,
   Thought,
+  UserProfile,
   UserSettings,
   WorkspaceSession,
 } from '../../shared/types'
@@ -50,6 +51,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   getSettings: () => request<UserSettings>('/settings'),
+  getUser: () => request<UserProfile>('/user'),
   patchSettings: (patch: Partial<UserSettings>) =>
     request<UserSettings>('/settings', { method: 'PATCH', body: JSON.stringify(patch) }),
 
@@ -66,10 +68,10 @@ export const api = {
     request<{ ok: boolean }>(`/ideas/${id}`, { method: 'DELETE' }),
 
   getIntegrations: () => request<{ connected: string[] }>('/integrations'),
-  connectIntegration: (providerId: string) =>
-    request<{ connected: string[] }>(`/integrations/${providerId}/connect`, {
+  connectIntegration: (providerId: string, account?: { email?: string }) =>
+    request<{ connected: string[]; user: UserProfile }>(`/integrations/${providerId}/connect`, {
       method: 'POST',
-      body: '{}',
+      body: JSON.stringify(account ?? {}),
     }),
   disconnectIntegration: (providerId: string) =>
     request<{ connected: string[] }>(`/integrations/${providerId}`, {

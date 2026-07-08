@@ -8,7 +8,7 @@ export const DEMO_EMAILS: DemoEmail[] = [
     subject: 'Q2 product launch timeline — need your input',
     receivedAt: '2026-06-18T08:42:00.000Z',
     source: 'outlook',
-    body: `Hi Alex,
+    body: `Hi {{firstName}},
 
 Hope you're doing well. Our leadership team is preparing for the Q2 launch review next Monday and I need a quick update from your side.
 
@@ -29,7 +29,7 @@ Sarah`,
     subject: 'Contract renewal — pricing discussion',
     receivedAt: '2026-06-17T14:15:00.000Z',
     source: 'outlook',
-    body: `Hello Alex,
+    body: `Hello {{firstName}},
 
 Your annual contract with Vendor.io is up for renewal on July 1. We'd love to continue the partnership.
 
@@ -48,7 +48,7 @@ Account Manager`,
     subject: 'Reschedule our design review?',
     receivedAt: '2026-06-18T06:30:00.000Z',
     source: 'outlook',
-    body: `Hey Alex,
+    body: `Hey {{firstName}},
 
 Something came up on my end — would you be open to moving our design review from tomorrow 2pm to Friday morning?
 

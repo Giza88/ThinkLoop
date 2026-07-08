@@ -9,6 +9,8 @@ function splitSqlStatements(sql: string): string[] {
     .filter((s) => s.length > 0 && !s.startsWith('--'))
 }
 
+const MIGRATIONS = ['0000_initial', '0001_user_email'] as const
+
 export async function runMigrations() {
   const client = getClient()
   await client.execute(`
@@ -19,22 +21,24 @@ export async function runMigrations() {
     )
   `)
 
-  const applied = await client.execute({
-    sql: 'SELECT name FROM _migrations WHERE name = ?',
-    args: ['0000_initial'],
-  })
+  for (const name of MIGRATIONS) {
+    const applied = await client.execute({
+      sql: 'SELECT name FROM _migrations WHERE name = ?',
+      args: [name],
+    })
 
-  if (applied.rows.length > 0) return
+    if (applied.rows.length > 0) continue
 
-  const migrationPath = path.join(process.cwd(), 'server', 'drizzle', '0000_initial.sql')
-  const sql = fs.readFileSync(migrationPath, 'utf8')
+    const migrationPath = path.join(process.cwd(), 'server', 'drizzle', `${name}.sql`)
+    const sql = fs.readFileSync(migrationPath, 'utf8')
 
-  for (const statement of splitSqlStatements(sql)) {
-    await client.execute(statement)
+    for (const statement of splitSqlStatements(sql)) {
+      await client.execute(statement)
+    }
+
+    await client.execute({
+      sql: 'INSERT INTO _migrations (name, applied_at) VALUES (?, ?)',
+      args: [name, new Date().toISOString()],
+    })
   }
-
-  await client.execute({
-    sql: 'INSERT INTO _migrations (name, applied_at) VALUES (?, ?)',
-    args: ['0000_initial', new Date().toISOString()],
-  })
 }

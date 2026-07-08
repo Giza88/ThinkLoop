@@ -14,6 +14,7 @@ export type {
   StructuredDocument,
   Thought,
   Theme,
+  UserProfile,
   UserSettings,
   WeeklyActivity,
   WorkspaceSession,

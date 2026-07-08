@@ -3,6 +3,7 @@ import { index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlit
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
   displayName: text('display_name').notNull(),
+  email: text('email'),
   createdAt: text('created_at').notNull(),
 })
 

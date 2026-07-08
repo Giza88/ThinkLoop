@@ -17,9 +17,15 @@ export async function integrationRoutes(app: FastifyInstance) {
 
   app.post<{ Params: { providerId: string } }>(
     '/integrations/:providerId/connect',
-    async (request) => ({
-      connected: await connectIntegration(request.params.providerId),
-    }),
+    async (request) => {
+      const body = z
+        .object({
+          email: z.string().email().optional(),
+        })
+        .parse(request.body ?? {})
+
+      return connectIntegration(request.params.providerId, undefined, body)
+    },
   )
 
   app.delete<{ Params: { providerId: string } }>(

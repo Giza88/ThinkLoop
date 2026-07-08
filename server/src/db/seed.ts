@@ -5,7 +5,6 @@ import {
   drafts,
   historyEntries,
   ideas,
-  integrations,
   userSettings,
   users,
   workspaceSessions,
@@ -56,7 +55,8 @@ export async function seedDatabase() {
 
   await db.insert(users).values({
     id: DEFAULT_USER_ID,
-    displayName: 'Alex Morgan',
+    displayName: '',
+    email: null,
     createdAt: now,
   })
 
@@ -85,14 +85,6 @@ export async function seedDatabase() {
       tagsJson: JSON.stringify(idea.tags),
       createdAt: now,
       updatedAt: now,
-    })
-  }
-
-  for (const providerId of ['microsoft', 'slack']) {
-    await db.insert(integrations).values({
-      userId: DEFAULT_USER_ID,
-      providerId,
-      connectedAt: now,
     })
   }
 }

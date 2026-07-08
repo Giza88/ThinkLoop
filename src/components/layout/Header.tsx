@@ -1,6 +1,18 @@
 import { Icon } from '../Icon'
+import type { UserProfile } from '../../types'
 
-export function Header() {
+function initialsFromName(name: string | null): string {
+  if (!name?.trim()) return '?'
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return `${parts[0][0] ?? ''}${parts[parts.length - 1][0] ?? ''}`.toUpperCase()
+}
+
+type HeaderProps = {
+  user?: UserProfile
+}
+
+export function Header({ user }: HeaderProps) {
   return (
     <header className="flex items-center gap-4 border-b border-tl-gray-200 bg-surface px-6 py-3">
       <div className="relative flex-1">
@@ -46,9 +58,11 @@ export function Header() {
         className="flex items-center gap-2 rounded-lg py-1 pl-1 pr-2 hover:bg-tl-gray-100"
       >
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tl-brand text-xs font-semibold text-white">
-          AM
+          {initialsFromName(user?.displayName ?? null)}
         </div>
-        <span className="text-sm font-medium text-tl-gray-700">Alex Morgan</span>
+        <span className="text-sm font-medium text-tl-gray-700">
+          {user?.displayName ?? 'Your account'}
+        </span>
         <Icon name="chevronDown" size={14} className="text-tl-gray-400" />
       </button>
     </header>

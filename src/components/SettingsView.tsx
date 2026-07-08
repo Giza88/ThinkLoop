@@ -11,7 +11,7 @@ type SettingsViewProps = {
   onAutoSaveChange: (value: boolean) => void
   onShowPromptsChange: (value: boolean) => void
   onRequireApprovalChange: (value: boolean) => void
-  onConnectIntegration: (providerId: string) => void
+  onConnectIntegration: (providerId: string, account?: { email?: string }) => void
   onDisconnectIntegration: (providerId: string) => void
 }
 

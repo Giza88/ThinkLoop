@@ -53,6 +53,12 @@ export type UserSettings = {
   sidebarCollapsed: boolean
 }
 
+export type UserProfile = {
+  displayName: string | null
+  email: string | null
+  firstName: string | null
+}
+
 export type WorkspaceSession = {
   thoughts: Thought[]
   document: StructuredDocument | null

@@ -5,7 +5,7 @@ import { ConnectModal } from './ConnectModal'
 
 type IntegrationsPanelProps = {
   connectedIds: string[]
-  onConnect: (providerId: string) => void
+  onConnect: (providerId: string, account?: { email?: string }) => void
   onDisconnect: (providerId: string) => void
   compact?: boolean
 }

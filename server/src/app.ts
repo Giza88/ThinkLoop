@@ -12,6 +12,7 @@ import { integrationRoutes } from './routes/integrations.js'
 import { migrateRoutes } from './routes/migrate.js'
 import { searchRoutes } from './routes/search.js'
 import { settingsRoutes } from './routes/settings.js'
+import { userRoutes } from './routes/user.js'
 import { workspaceRoutes } from './routes/workspace.js'
 
 export async function buildApp(): Promise<FastifyInstance> {
@@ -31,6 +32,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(
     async (api) => {
       await api.register(settingsRoutes)
+      await api.register(userRoutes)
       await api.register(draftRoutes)
       await api.register(historyRoutes)
       await api.register(ideaRoutes)

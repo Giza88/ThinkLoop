@@ -20,6 +20,11 @@ import {
 import { upsertDraftFromDocument } from './drafts.js'
 import { addHistoryEntry } from './history.js'
 import { organizeThoughts } from './organize.js'
+import {
+  EMAIL_INTEGRATION_PROVIDERS,
+  getUserProfile,
+  updateUserFromEmailAccount,
+} from './users.js'
 
 export async function getSettings(userId = DEFAULT_USER_ID): Promise<UserSettings> {
   const db = getDb()
@@ -297,16 +302,27 @@ export async function setIntegrations(
 export async function connectIntegration(
   providerId: string,
   userId = DEFAULT_USER_ID,
-): Promise<string[]> {
+  account?: { email?: string },
+): Promise<{ connected: string[]; user: Awaited<ReturnType<typeof getUserProfile>> }> {
   const current = await listIntegrations(userId)
-  if (current.includes(providerId)) return current
-  const db = getDb()
-  await db.insert(integrations).values({
-    userId,
-    providerId,
-    connectedAt: new Date().toISOString(),
-  })
-  return [...current, providerId]
+  if (!current.includes(providerId)) {
+    const db = getDb()
+    await db.insert(integrations).values({
+      userId,
+      providerId,
+      connectedAt: new Date().toISOString(),
+    })
+  }
+
+  let user = await getUserProfile(userId)
+  if (
+    EMAIL_INTEGRATION_PROVIDERS.has(providerId) &&
+    account?.email?.trim()
+  ) {
+    user = await updateUserFromEmailAccount(account.email, userId)
+  }
+
+  return { connected: await listIntegrations(userId), user }
 }
 
 export async function disconnectIntegration(

@@ -7,6 +7,8 @@ export type IntegrationProvider = {
   initials: string
 }
 
+export const EMAIL_INTEGRATION_IDS = new Set(['microsoft', 'google'])
+
 export const INTEGRATION_PROVIDERS: IntegrationProvider[] = [
   {
     id: 'microsoft',

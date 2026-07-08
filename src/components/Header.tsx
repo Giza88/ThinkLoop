@@ -1,11 +1,20 @@
 import { Bell, ChevronDown, Moon, Search, Sun, User } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
+import type { UserProfile } from '../types'
+
+function initialsFromName(name: string | null): string {
+  if (!name?.trim()) return '?'
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return `${parts[0][0] ?? ''}${parts[parts.length - 1][0] ?? ''}`.toUpperCase()
+}
 
 type HeaderProps = {
+  user: UserProfile
   onSearchFocus: () => void
 }
 
-export function Header({ onSearchFocus }: HeaderProps) {
+export function Header({ user, onSearchFocus }: HeaderProps) {
   const { isDark, toggleTheme } = useTheme()
 
   return (
@@ -51,10 +60,16 @@ export function Header({ onSearchFocus }: HeaderProps) {
           type="button"
           className="flex items-center gap-2 rounded-xl border border-tl-gray-200/80 bg-surface/60 px-2 py-1.5 transition-all hover:border-tl-purple-200/60 hover:bg-surface-raised"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tl-brand shadow-tl-brand">
-            <User className="h-4 w-4 text-white" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tl-brand shadow-tl-brand text-xs font-semibold text-white">
+            {user.displayName ? (
+              initialsFromName(user.displayName)
+            ) : (
+              <User className="h-4 w-4" />
+            )}
           </div>
-          <span className="hidden text-sm font-medium text-tl-gray-700 md:block">Alex Morgan</span>
+          <span className="hidden text-sm font-medium text-tl-gray-700 md:block">
+            {user.displayName ?? 'Your account'}
+          </span>
           <ChevronDown className="hidden h-4 w-4 text-tl-gray-400 md:block" />
         </button>
       </div>

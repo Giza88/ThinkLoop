@@ -2,21 +2,23 @@ import { ArrowRight, Lightbulb, Plug, Sparkles } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import { useToast } from '../context/ToastContext'
-import type { DashboardStats, IdeaCard } from '../types'
+import type { DashboardStats, IdeaCard, UserProfile } from '../types'
 import { getErrorMessage } from '../utils/getErrorMessage'
 import { HumanLoopBackbone } from './HumanLoopBackbone'
 import { IntegrationsPanel } from './IntegrationsPanel'
 import { StatsSection } from './StatsSection'
 
 type DashboardHomeProps = {
+  user: UserProfile
   connectedIntegrations: string[]
   stats: DashboardStats | null
   onNavigate: (view: string) => void
-  onConnectIntegration: (providerId: string) => void
+  onConnectIntegration: (providerId: string, account?: { email?: string }) => void
   onDisconnectIntegration: (providerId: string) => void
 }
 
 export function DashboardHome({
+  user,
   connectedIntegrations,
   stats,
   onNavigate,
@@ -35,7 +37,9 @@ export function DashboardHome({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-tl-gray-900">Good morning, Alex</h1>
+        <h1 className="text-2xl font-bold text-tl-gray-900">
+          {user.firstName ? `Good morning, ${user.firstName}` : 'Good morning'}
+        </h1>
         <p className="mt-1 text-sm text-tl-gray-500">
           Connect your tools, let the agent propose — you stay the backbone of every decision.
         </p>

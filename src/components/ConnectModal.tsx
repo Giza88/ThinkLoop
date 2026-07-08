@@ -1,29 +1,41 @@
-import { Loader2, Shield, X } from 'lucide-react'
+import { Loader2, Mail, Shield, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import type { IntegrationProvider } from '../data/integrations'
+import { EMAIL_INTEGRATION_IDS, type IntegrationProvider } from '../data/integrations'
 
 type ConnectModalProps = {
   provider: IntegrationProvider | null
   open: boolean
   onClose: () => void
-  onConnected: (providerId: string) => void
+  onConnected: (providerId: string, account?: { email?: string }) => void
 }
 
 export function ConnectModal({ provider, open, onClose, onConnected }: ConnectModalProps) {
   const [phase, setPhase] = useState<'signin' | 'authorizing' | 'done'>('signin')
+  const [email, setEmail] = useState('')
+
+  const needsEmail = provider ? EMAIL_INTEGRATION_IDS.has(provider.id) : false
+  const emailValid = !needsEmail || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
 
   useEffect(() => {
-    if (open) setPhase('signin')
+    if (open) {
+      setPhase('signin')
+      setEmail('')
+    }
   }, [open, provider?.id])
 
   if (!open || !provider) return null
 
   const handleConnect = () => {
+    if (!emailValid) return
+
     setPhase('authorizing')
     window.setTimeout(() => {
       setPhase('done')
       window.setTimeout(() => {
-        onConnected(provider.id)
+        onConnected(
+          provider.id,
+          needsEmail ? { email: email.trim() } : undefined,
+        )
         onClose()
       }, 600)
     }, 1400)
@@ -67,6 +79,30 @@ export function ConnectModal({ provider, open, onClose, onConnected }: ConnectMo
                 You&apos;ll sign in with {provider.name}. ThinkLoop only accesses what you allow —
                 and always asks before acting on your behalf.
               </p>
+
+              {needsEmail && (
+                <div>
+                  <label htmlFor="connect-email" className="text-xs font-medium text-tl-gray-700">
+                    Work email
+                  </label>
+                  <div className="relative mt-1.5">
+                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-tl-gray-400" />
+                    <input
+                      id="connect-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@company.com"
+                      className="tl-input w-full py-2.5 pl-10 pr-3 text-sm"
+                      autoComplete="email"
+                    />
+                  </div>
+                  <p className="mt-1.5 text-[11px] text-tl-gray-500">
+                    We&apos;ll use your email address to personalize greetings and draft sign-offs.
+                  </p>
+                </div>
+              )}
+
               <div className="rounded-xl border border-tl-cyan-100 bg-tl-cyan-50 px-4 py-3">
                 <div className="flex gap-2">
                   <Shield className="h-4 w-4 shrink-0 text-tl-cyan-500" />
@@ -79,7 +115,8 @@ export function ConnectModal({ provider, open, onClose, onConnected }: ConnectMo
               <button
                 type="button"
                 onClick={handleConnect}
-                className="w-full rounded-xl bg-tl-brand bg-tl-brand-hover py-2.5 text-sm font-medium text-white transition-colors "
+                disabled={!emailValid}
+                className="w-full rounded-xl bg-tl-brand bg-tl-brand-hover py-2.5 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Continue to {provider.name} sign-in
               </button>

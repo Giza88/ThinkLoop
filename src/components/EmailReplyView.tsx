@@ -10,17 +10,19 @@ import {
   Sparkles,
   XCircle,
 } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '../api/client'
 import { useToast } from '../context/ToastContext'
 import { DEMO_EMAILS } from '../data/demoEmails'
-import type { DemoEmail, EmailAnalyzeResult, EmailDraft, EmailQuestion } from '../types'
+import type { DemoEmail, EmailAnalyzeResult, EmailDraft, EmailQuestion, UserProfile } from '../types'
 import { getErrorMessage } from '../utils/getErrorMessage'
+import { personalizeDemoEmails } from '../utils/personalizeDemoEmails'
 
 type Step = 'inbox' | 'analyzing' | 'questions' | 'drafting' | 'review' | 'approved'
 
 type EmailReplyViewProps = {
   outlookConnected: boolean
+  user: UserProfile
 }
 
 const STEPS: { id: Step; label: string }[] = [
@@ -79,13 +81,24 @@ function EmailCard({
   )
 }
 
-export function EmailReplyView({ outlookConnected }: EmailReplyViewProps) {
+export function EmailReplyView({ outlookConnected, user }: EmailReplyViewProps) {
   const toast = useToast()
+  const demoEmails = useMemo(
+    () => personalizeDemoEmails(DEMO_EMAILS, user.firstName),
+    [user.firstName],
+  )
   const [step, setStep] = useState<Step>('inbox')
-  const [selectedEmail, setSelectedEmail] = useState<DemoEmail | null>(DEMO_EMAILS[0] ?? null)
+  const [selectedEmail, setSelectedEmail] = useState<DemoEmail | null>(demoEmails[0] ?? null)
   const [analysis, setAnalysis] = useState<EmailAnalyzeResult | null>(null)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [draft, setDraft] = useState<EmailDraft | null>(null)
+
+  useEffect(() => {
+    setSelectedEmail((current) => {
+      if (!current) return demoEmails[0] ?? null
+      return demoEmails.find((email) => email.id === current.id) ?? demoEmails[0] ?? null
+    })
+  }, [demoEmails])
 
   const reset = useCallback(() => {
     setStep('inbox')
@@ -220,7 +233,7 @@ export function EmailReplyView({ outlookConnected }: EmailReplyViewProps) {
           <div className="space-y-4">
             <h2 className="text-sm font-semibold text-tl-gray-900">Inbox (demo)</h2>
             <div className="space-y-3">
-              {DEMO_EMAILS.map((email) => (
+              {demoEmails.map((email) => (
                 <EmailCard
                   key={email.id}
                   email={email}
