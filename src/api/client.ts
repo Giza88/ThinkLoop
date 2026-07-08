@@ -36,11 +36,17 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     let message = response.statusText
+    const raw = await response.text()
     try {
-      const body = (await response.json()) as { error?: string }
+      const body = JSON.parse(raw) as { error?: string }
       if (body.error) message = body.error
     } catch {
-      // ignore
+      if (raw.includes('FUNCTION_INVOCATION_FAILED')) {
+        message =
+          'API unavailable on this deployment. Redeploy after setting TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in Vercel.'
+      } else if (raw.trim()) {
+        message = raw.trim().slice(0, 240)
+      }
     }
     throw new ApiError(response.status, message)
   }

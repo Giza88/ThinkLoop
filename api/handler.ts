@@ -22,12 +22,25 @@ async function ensureApp() {
   return app!
 }
 
+function formatInitError(err: unknown): string {
+  const message = err instanceof Error ? err.message : 'Server initialization failed'
+
+  if (
+    message.includes('Unable to open connection to local database') ||
+    message.includes('ConnectionFailed')
+  ) {
+    return 'Database not configured for Vercel. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in the Vercel project (Production and Preview), then redeploy.'
+  }
+
+  return message
+}
+
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   try {
     const fastify = await ensureApp()
     fastify.server.emit('request', req, res)
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Server initialization failed'
+    const message = formatInitError(err)
     if (!res.headersSent) {
       res.statusCode = 503
       res.setHeader('Content-Type', 'application/json')

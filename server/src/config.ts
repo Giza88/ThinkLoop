@@ -45,8 +45,16 @@ export function isRemoteDatabase(): boolean {
   return isTurso || DATABASE_URL.startsWith('libsql://') || DATABASE_URL.startsWith('https://')
 }
 
+export function isVercelRuntime(): boolean {
+  return (
+    process.env.VERCEL === '1' ||
+    Boolean(process.env.VERCEL_ENV) ||
+    Boolean(process.env.VERCEL_URL)
+  )
+}
+
 export function assertDatabaseConfigured(): void {
-  if (process.env.VERCEL === '1' && !isRemoteDatabase()) {
+  if (isVercelRuntime() && !isRemoteDatabase()) {
     throw new Error(
       'Database not configured for Vercel. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in the Vercel project environment (Production and Preview), then redeploy.',
     )
