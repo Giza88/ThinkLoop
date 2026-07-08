@@ -6,8 +6,9 @@ import type {
   EmailInput,
   EmailQuestionAnswer,
 } from '../../../shared/types.js'
-import { isOpenRouterEnabled } from '../config.js'
+import { DEFAULT_USER_ID, isOpenRouterEnabled } from '../config.js'
 import { completeJson } from './llm.js'
+import { getUserDisplayName } from './users.js'
 
 const analyzeSchema = z.object({
   summary: z.string().min(1),
@@ -39,7 +40,12 @@ Read the email carefully. Return ONLY valid JSON (no markdown fences):
 
 Ask exactly 3 specific questions about facts only the user knows: key content for the reply, decisions or commitments to make, and anything to avoid. Do not ask about tone or writing style separately — that will be inferred from how the user phrases their answers. Do not ask who to CC. Do not ask questions you can infer from the email.`
 
-const DRAFT_SYSTEM = `You are ThinkLoop's email assistant. You draft reply emails on behalf of the user (Alex). The user has already reviewed the inbound email and answered clarifying questions — your job is to turn those answers into a polished, send-ready reply.
+function buildDraftSystem(displayName: string | null): string {
+  const userRef = displayName
+    ? `the user (${displayName})`
+    : 'the user'
+
+  return `You are ThinkLoop's email assistant. You draft reply emails on behalf of ${userRef}. The user has already reviewed the inbound email and answered clarifying questions — your job is to turn those answers into a polished, send-ready reply.
 
 Return ONLY valid JSON (no markdown fences):
 {
@@ -66,6 +72,27 @@ How to write a great reply:
 6. KEEP it concise. Most replies should be 3–6 short paragraphs. Cut filler and corporate jargon unless the user explicitly writes that way.
 
 7. FORMAT body with paragraphs separated by \\n\\n. No bullet markdown. Plain text only.`
+}
+
+function buildDraftUserMessage(
+  email: EmailInput,
+  answerText: string,
+  displayName: string | null,
+): string {
+  const signOffInstruction = displayName
+    ? `Write the reply as ${displayName}. Sign off appropriately for the tone inferred from the user's answers.`
+    : `Sign off as the user (use a generic closing like Best regards if name unknown).`
+
+  return `Draft a reply to this email using ONLY the user's answers below. Address every question the sender asked.
+
+--- INBOUND EMAIL ---
+${formatEmail(email)}
+
+--- USER'S ANSWERS (source of truth for content and tone) ---
+${answerText}
+
+${signOffInstruction}`
+}
 
 function formatEmail(email: EmailInput): string {
   return `From: ${email.from} <${email.fromEmail}>
@@ -101,11 +128,14 @@ function analyzeWithRules(email: EmailInput): EmailAnalyzeResult {
 function draftWithRules(
   email: EmailInput,
   answers: EmailQuestionAnswer[],
+  displayName: string | null,
 ): EmailDraft {
   const answerBlock = answers
     .filter((a) => a.answer.trim())
     .map((a) => `- ${a.answer.trim()}`)
     .join('\n')
+
+  const signOff = displayName ? `Best regards,\n${displayName}` : 'Best regards'
 
   return {
     subject: email.subject.startsWith('Re:') ? email.subject : `Re: ${email.subject}`,
@@ -115,7 +145,7 @@ Thank you for your email regarding "${email.subject}".
 
 ${answerBlock ? `Based on our current plans:\n${answerBlock}\n\n` : ''}Please let me know if you need anything else.
 
-Best regards`,
+${signOff}`,
     generatedAt: new Date().toISOString(),
     approvalStatus: 'pending',
   }
@@ -148,7 +178,10 @@ export async function analyzeEmail(email: EmailInput): Promise<EmailAnalyzeResul
 export async function draftEmailReply(
   email: EmailInput,
   answers: EmailQuestionAnswer[],
+  userId = DEFAULT_USER_ID,
 ): Promise<EmailDraft> {
+  const displayName = await getUserDisplayName(userId)
+
   if (isOpenRouterEnabled()) {
     try {
       const answerText = answers
@@ -156,16 +189,8 @@ export async function draftEmailReply(
         .join('\n\n')
 
       const parsed = await completeJson(
-        DRAFT_SYSTEM,
-        `Draft a reply to this email using ONLY the user's answers below. Address every question the sender asked.
-
---- INBOUND EMAIL ---
-${formatEmail(email)}
-
---- USER'S ANSWERS (source of truth for content and tone) ---
-${answerText}
-
-Write the reply as Alex. Sign off appropriately for the tone inferred from the user's answers.`,
+        buildDraftSystem(displayName),
+        buildDraftUserMessage(email, answerText, displayName),
         draftSchema,
       )
 
@@ -180,5 +205,5 @@ Write the reply as Alex. Sign off appropriately for the tone inferred from the u
     }
   }
 
-  return draftWithRules(email, answers)
+  return draftWithRules(email, answers, displayName)
 }

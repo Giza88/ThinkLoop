@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
+import { DEFAULT_USER_ID } from '../config.js'
 import { analyzeEmail, draftEmailReply } from '../services/emailAgent.js'
 
 const emailSchema = z.object({
@@ -38,7 +39,7 @@ export async function emailRoutes(app: FastifyInstance) {
       .parse(request.body)
 
     try {
-      return await draftEmailReply(body.email, body.answers)
+      return await draftEmailReply(body.email, body.answers, DEFAULT_USER_ID)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Draft generation failed'
       return reply.status(500).send({ error: message })

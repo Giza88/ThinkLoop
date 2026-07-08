@@ -1,0 +1,9 @@
+{
+  "id": "email-1",
+  "from": "Sarah Chen",
+  "fromEmail": "sarah.chen@acmecorp.com",
+  "subject": "Q2 product launch timeline — need your input",
+  "receivedAt": "2026-06-18T08:42:00.000Z",
+  "source": "outlook",
+  "body": "Hi Alex,\n\nHope you're doing well. Our leadership team is preparing for the Q2 launch review next Monday and I need a quick update from your side.\n\nSpecifically:\n1. Are we still on track for the April 15 beta release?\n2. What's the current status on the onboarding flow redesign?\n3. Do you foresee any blockers we should flag to the exec team?\n\nIf possible, could you send something back by EOD Thursday? Happy to jump on a quick call if that's easier.\n\nThanks,\nSarah"
+}
