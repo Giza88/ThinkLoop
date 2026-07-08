@@ -1,8 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 function loadDotEnv() {
   const envPath = path.join(process.cwd(), '.env')
@@ -32,7 +29,7 @@ loadDotEnv()
 
 export const PORT = Number(process.env.PORT ?? 3001)
 export const DB_PATH =
-  process.env.DB_PATH ?? path.join(__dirname, '..', 'data', 'thinkloop.db')
+  process.env.DB_PATH ?? path.join(process.cwd(), 'server', 'data', 'thinkloop.db')
 export const DEFAULT_USER_ID = 'default'
 
 const isTurso = Boolean(process.env.TURSO_DATABASE_URL)

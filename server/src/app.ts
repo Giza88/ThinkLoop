@@ -1,5 +1,8 @@
 import cors from '@fastify/cors'
+import fastifyStatic from '@fastify/static'
 import Fastify, { type FastifyInstance } from 'fastify'
+import fs from 'node:fs'
+import path from 'node:path'
 import { getOrganizerMode, isRemoteDatabase } from './config.js'
 import { draftRoutes } from './routes/drafts.js'
 import { emailRoutes } from './routes/email.js'
@@ -39,6 +42,22 @@ export async function buildApp(): Promise<FastifyInstance> {
     },
     { prefix: '/api/v1' },
   )
+
+  const distPath = path.join(process.cwd(), 'dist')
+  if (fs.existsSync(path.join(distPath, 'index.html'))) {
+    await app.register(fastifyStatic, {
+      root: distPath,
+      wildcard: false,
+    })
+
+    app.setNotFoundHandler((request, reply) => {
+      const pathname = request.url.split('?')[0]
+      if (pathname.startsWith('/api/') || pathname === '/health') {
+        return reply.status(404).send({ error: 'Not found' })
+      }
+      return reply.sendFile('index.html')
+    })
+  }
 
   return app
 }

@@ -1,9 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { getClient } from './index.js'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 function splitSqlStatements(sql: string): string[] {
   return sql
@@ -29,7 +26,7 @@ export async function runMigrations() {
 
   if (applied.rows.length > 0) return
 
-  const migrationPath = path.join(__dirname, '..', '..', 'drizzle', '0000_initial.sql')
+  const migrationPath = path.join(process.cwd(), 'server', 'drizzle', '0000_initial.sql')
   const sql = fs.readFileSync(migrationPath, 'utf8')
 
   for (const statement of splitSqlStatements(sql)) {

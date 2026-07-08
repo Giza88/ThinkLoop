@@ -39,19 +39,33 @@ Read the email carefully. Return ONLY valid JSON (no markdown fences):
 
 Ask exactly 3 specific questions about facts only the user knows: key content for the reply, decisions or commitments to make, and anything to avoid. Do not ask about tone or writing style separately — that will be inferred from how the user phrases their answers. Do not ask who to CC. Do not ask questions you can infer from the email.`
 
-const DRAFT_SYSTEM = `You are ThinkLoop's email assistant. Draft a reply email based on the original message and the user's answers to clarifying questions.
+const DRAFT_SYSTEM = `You are ThinkLoop's email assistant. You draft reply emails on behalf of the user (Alex). The user has already reviewed the inbound email and answered clarifying questions — your job is to turn those answers into a polished, send-ready reply.
 
 Return ONLY valid JSON (no markdown fences):
 {
-  "subject": "Re: ... subject line",
-  "body": "full email body with greeting and sign-off. Use plain text paragraphs separated by \\n\\n. Sign off as the user (use a generic closing like Best regards if name unknown)."
+  "subject": "Re: <original subject, without duplicating Re:>",
+  "body": "plain-text email body"
 }
 
-Critical rules:
-- Mirror the user's requested tone and style exactly (formal, casual, friendly, direct, apologetic, etc.) using their answers as the source of truth.
-- Weave in their specific facts, dates, numbers, and decisions verbatim where appropriate — do not contradict or soften their intent.
-- Match how they speak in their answers: short and punchy vs. warm and detailed.
-- Be concise and actionable. Do not invent commitments the user did not authorize in their answers.`
+How to write a great reply:
+
+1. OPEN naturally — greet the sender by first name. Skip generic openers like "Thank you for your email regarding…". Jump straight into a warm, human acknowledgment of what they need.
+
+2. ANSWER every question or request from the original email. If they asked numbered items, mirror that structure (numbered or short paragraphs) so nothing is left hanging.
+
+3. USE the user's answers as the single source of truth for facts, dates, numbers, decisions, and tone. Do not invent, soften, or add commitments they did not authorize.
+
+4. MATCH their voice — infer tone and style from how they wrote their answers:
+   - Casual answers → short sentences, contractions, friendly sign-off (e.g. "Thanks!", "Cheers")
+   - Formal answers → complete sentences, no slang, "Best regards" or similar
+   - Direct answers → get to the point fast, minimal filler
+   - Warm answers → brief personal touch, appreciative language
+
+5. CLOSE with a clear next step when relevant (confirm a date, offer a call, ask one follow-up) — only if the user's answers support it.
+
+6. KEEP it concise. Most replies should be 3–6 short paragraphs. Cut filler and corporate jargon unless the user explicitly writes that way.
+
+7. FORMAT body with paragraphs separated by \\n\\n. No bullet markdown. Plain text only.`
 
 function formatEmail(email: EmailInput): string {
   return `From: ${email.from} <${email.fromEmail}>
@@ -143,7 +157,15 @@ export async function draftEmailReply(
 
       const parsed = await completeJson(
         DRAFT_SYSTEM,
-        `Original email:\n${formatEmail(email)}\n\nUser's answers:\n${answerText}`,
+        `Draft a reply to this email using ONLY the user's answers below. Address every question the sender asked.
+
+--- INBOUND EMAIL ---
+${formatEmail(email)}
+
+--- USER'S ANSWERS (source of truth for content and tone) ---
+${answerText}
+
+Write the reply as Alex. Sign off appropriately for the tone inferred from the user's answers.`,
         draftSchema,
       )
 
