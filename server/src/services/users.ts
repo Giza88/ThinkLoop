@@ -22,7 +22,7 @@ export function firstNameFromDisplayName(displayName: string): string {
   return trimmed.split(/\s+/)[0] ?? trimmed
 }
 
-function toUserProfile(row: {
+export function toUserProfile(row: {
   displayName: string
   email: string | null
 }): UserProfile {
@@ -69,9 +69,8 @@ export async function updateUserFromEmailAccount(
     .set({ email: normalizedEmail, displayName })
     .where(eq(users.id, userId))
 
-  return {
+  return toUserProfile({
     displayName,
     email: normalizedEmail,
-    firstName: firstNameFromDisplayName(displayName),
-  }
+  })
 }
