@@ -45,6 +45,14 @@ export function isRemoteDatabase(): boolean {
   return isTurso || DATABASE_URL.startsWith('libsql://') || DATABASE_URL.startsWith('https://')
 }
 
+export function assertDatabaseConfigured(): void {
+  if (process.env.VERCEL === '1' && !isRemoteDatabase()) {
+    throw new Error(
+      'Database not configured for Vercel. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in the Vercel project environment (Production and Preview), then redeploy.',
+    )
+  }
+}
+
 export const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY ?? ''
 export const OPENROUTER_MODEL =
   process.env.OPENROUTER_MODEL ?? 'openai/gpt-4o-mini'
