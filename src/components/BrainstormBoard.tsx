@@ -88,6 +88,7 @@ export function BrainstormBoard() {
           </div>
           <button
             type="button"
+            data-testid="add-idea-toggle"
             onClick={() => setShowForm((open) => !open)}
             className="flex items-center gap-1.5 rounded-xl bg-tl-brand bg-tl-brand-hover px-4 py-2 text-sm font-medium text-white transition-colors"
           >
@@ -118,6 +119,7 @@ export function BrainstormBoard() {
                   <button
                     key={tag}
                     type="button"
+                    data-testid={`tag-${tag}`}
                     onClick={() => toggleTag(tag)}
                     className={`rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors ${
                       selectedTags.includes(tag)
@@ -131,6 +133,7 @@ export function BrainstormBoard() {
               </div>
               <button
                 type="button"
+                data-testid="save-idea"
                 onClick={handleAddIdea}
                 disabled={!title.trim() || !description.trim()}
                 className="rounded-xl bg-tl-brand bg-tl-brand-hover px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"

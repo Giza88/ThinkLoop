@@ -100,6 +100,7 @@ export function Sidebar({ collapsed, activeItem, draftCount = 0, onToggle, onNav
                   <li key={item.id}>
                     <button
                       type="button"
+                      data-testid={`nav-${item.id}`}
                       onClick={() => onNavigate(item.id)}
                       title={collapsed ? item.label : undefined}
                       className={`relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
@@ -146,6 +147,7 @@ export function Sidebar({ collapsed, activeItem, draftCount = 0, onToggle, onNav
       <div className="border-t border-tl-gray-200/60 p-3">
         <button
           type="button"
+          data-testid="nav-settings"
           onClick={() => onNavigate('settings')}
           className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
             activeItem === 'settings'
@@ -160,6 +162,7 @@ export function Sidebar({ collapsed, activeItem, draftCount = 0, onToggle, onNav
 
         <button
           type="button"
+          data-testid="sidebar-toggle"
           onClick={onToggle}
           className="mt-2 flex w-full items-center justify-center rounded-xl p-2 text-tl-gray-400 transition-all hover:bg-tl-gray-100 hover:text-tl-gray-600 dark:hover:bg-tl-gray-200/10"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}

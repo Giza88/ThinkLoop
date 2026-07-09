@@ -44,6 +44,7 @@ export function DocumentPanel({
           <div className="flex items-center gap-2">
             <button
               type="button"
+              data-testid="copy-btn"
               onClick={onCopy}
               className="rounded-lg border border-tl-gray-200 p-2 text-tl-gray-500 transition-colors hover:bg-tl-gray-50 hover:text-tl-gray-700"
               aria-label="Copy document"
@@ -52,6 +53,7 @@ export function DocumentPanel({
             </button>
             <button
               type="button"
+              data-testid="export-btn"
               onClick={onExport}
               className="rounded-lg border border-tl-gray-200 p-2 text-tl-gray-500 transition-colors hover:bg-tl-gray-50 hover:text-tl-gray-700"
               aria-label="Export document"
@@ -78,6 +80,7 @@ export function DocumentPanel({
             <div className="flex shrink-0 gap-2">
               <button
                 type="button"
+                data-testid="reject-btn"
                 onClick={onReject}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-tl-gray-200 bg-surface px-3 py-1.5 text-xs font-medium text-tl-gray-600 transition-colors hover:bg-tl-gray-50"
               >
@@ -86,6 +89,7 @@ export function DocumentPanel({
               </button>
               <button
                 type="button"
+                data-testid="approve-btn"
                 onClick={onApprove}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-tl-cyan-500 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-tl-cyan-600"
               >
@@ -110,6 +114,7 @@ export function DocumentPanel({
             </p>
             <button
               type="button"
+              data-testid="organize-btn"
               onClick={onOrganize}
               disabled={thoughtCount === 0 || isOrganizing}
               className="mt-6 flex items-center gap-2 rounded-xl bg-tl-brand bg-tl-brand-hover px-5 py-2.5 text-sm font-medium text-white transition-colors  disabled:cursor-not-allowed disabled:opacity-50"
@@ -147,6 +152,7 @@ export function DocumentPanel({
               {isApproved && (
                 <button
                   type="button"
+                  data-testid="reorganize-btn"
                   onClick={onOrganize}
                   disabled={isOrganizing}
                   className="flex items-center gap-2 rounded-xl border border-tl-purple-200 bg-tl-purple-50 px-4 py-2 text-sm font-medium text-tl-purple-600 transition-colors hover:bg-tl-purple-100 disabled:opacity-50"

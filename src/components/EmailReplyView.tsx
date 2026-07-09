@@ -59,6 +59,7 @@ function EmailCard({
   return (
     <button
       type="button"
+      data-testid={`email-card-${email.id}`}
       onClick={onSelect}
       className={`w-full rounded-xl border p-4 text-left transition-all ${
         selected
@@ -266,6 +267,7 @@ export function EmailReplyView({ outlookConnected, user }: EmailReplyViewProps) 
                 </div>
                 <button
                   type="button"
+                  data-testid="analyze-btn"
                   onClick={handleAnalyze}
                   disabled={step === 'analyzing'}
                   className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-tl-brand bg-tl-brand-hover px-5 py-3 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
@@ -305,6 +307,7 @@ export function EmailReplyView({ outlookConnected, user }: EmailReplyViewProps) 
             </div>
             <button
               type="button"
+              data-testid="reset-flow"
               onClick={reset}
               className="mt-4 inline-flex items-center gap-1.5 text-xs text-tl-gray-500 hover:text-tl-gray-700"
             >
@@ -348,6 +351,7 @@ export function EmailReplyView({ outlookConnected, user }: EmailReplyViewProps) 
 
             <button
               type="button"
+              data-testid="draft-btn"
               onClick={handleDraft}
               disabled={step === 'drafting'}
               className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-tl-brand bg-tl-brand-hover px-5 py-3 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
@@ -398,6 +402,7 @@ export function EmailReplyView({ outlookConnected, user }: EmailReplyViewProps) 
                   <div className="flex shrink-0 gap-2">
                     <button
                       type="button"
+                      data-testid="reject-draft"
                       onClick={handleReject}
                       className="inline-flex items-center gap-1.5 rounded-lg border border-tl-gray-200 bg-surface px-3 py-1.5 text-xs font-medium text-tl-gray-600 hover:bg-tl-gray-50"
                     >
@@ -406,6 +411,7 @@ export function EmailReplyView({ outlookConnected, user }: EmailReplyViewProps) 
                     </button>
                     <button
                       type="button"
+                      data-testid="approve-draft"
                       onClick={handleApprove}
                       className="inline-flex items-center gap-1.5 rounded-lg bg-tl-cyan-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-tl-cyan-600"
                     >
@@ -447,6 +453,7 @@ export function EmailReplyView({ outlookConnected, user }: EmailReplyViewProps) 
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-tl-gray-100 pt-4">
                 <button
                   type="button"
+                  data-testid="reset-flow"
                   onClick={reset}
                   className="text-xs text-tl-gray-500 hover:text-tl-gray-700"
                 >
@@ -455,6 +462,7 @@ export function EmailReplyView({ outlookConnected, user }: EmailReplyViewProps) 
                 <div className="flex gap-2">
                   <button
                     type="button"
+                    data-testid="copy-draft"
                     onClick={handleCopy}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-tl-gray-200 px-3 py-2 text-xs font-medium text-tl-gray-600 hover:bg-tl-gray-50"
                   >
@@ -464,6 +472,7 @@ export function EmailReplyView({ outlookConnected, user }: EmailReplyViewProps) 
                   {step === 'approved' && (
                     <button
                       type="button"
+                      data-testid="send-outlook"
                       onClick={handleMockSend}
                       className="inline-flex items-center gap-1.5 rounded-lg bg-tl-brand px-4 py-2 text-xs font-medium text-white"
                     >

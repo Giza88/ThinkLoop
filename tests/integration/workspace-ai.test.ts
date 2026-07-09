@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 import { apiFetch, getBaseUrl, parseJsonResponse, requireHealthyApi } from '../helpers/api.js'
+import { resetWorkspaceState } from '../helpers/workspace.js'
 import type { WorkspaceSession } from '../../shared/types.js'
 
 describe(`workspace AI @ ${getBaseUrl()}`, () => {
@@ -8,6 +9,7 @@ describe(`workspace AI @ ${getBaseUrl()}`, () => {
   beforeAll(async () => {
     const health = await requireHealthyApi()
     organizer = health.organizer
+    await resetWorkspaceState()
   })
 
   it('adds thoughts and organizes into a structured document', async () => {

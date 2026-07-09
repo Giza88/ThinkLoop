@@ -439,7 +439,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-full bg-tl-mesh">
+    <div className="flex h-full bg-tl-mesh" data-testid="app-shell">
       <Sidebar
         collapsed={sidebarCollapsed}
         activeItem={activeNav}

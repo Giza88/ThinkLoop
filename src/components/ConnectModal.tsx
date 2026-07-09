@@ -45,11 +45,12 @@ export function ConnectModal({ provider, open, onClose, onConnected }: ConnectMo
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
+        data-testid="connect-modal-backdrop"
         className="absolute inset-0 bg-black/50 backdrop-blur-md dark:bg-black/70"
         onClick={onClose}
         aria-label="Close"
       />
-      <div className="glass-panel relative w-full max-w-md rounded-2xl border shadow-xl">
+      <div className="glass-panel relative w-full max-w-md rounded-2xl border shadow-xl" data-testid="connect-modal">
         <div className="flex items-center justify-between border-b border-tl-gray-100 px-5 py-4">
           <div className="flex items-center gap-3">
             <div
@@ -89,6 +90,7 @@ export function ConnectModal({ provider, open, onClose, onConnected }: ConnectMo
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-tl-gray-400" />
                     <input
                       id="connect-email"
+                      data-testid="connect-email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -114,6 +116,7 @@ export function ConnectModal({ provider, open, onClose, onConnected }: ConnectMo
               </div>
               <button
                 type="button"
+                data-testid="connect-continue"
                 onClick={handleConnect}
                 disabled={!emailValid}
                 className="w-full rounded-xl bg-tl-brand bg-tl-brand-hover py-2.5 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"

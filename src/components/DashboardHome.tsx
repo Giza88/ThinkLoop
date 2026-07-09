@@ -57,6 +57,7 @@ export function DashboardHome({
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <button
           type="button"
+          data-testid="card-new-session"
           onClick={() => onNavigate('workspace')}
           className="group flex items-start gap-4 tl-card p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-tl-brand"
         >
@@ -77,6 +78,7 @@ export function DashboardHome({
 
         <button
           type="button"
+          data-testid="card-connect-tools"
           onClick={() => onNavigate('settings')}
           className="group flex items-start gap-4 tl-card p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-tl-brand"
         >
@@ -97,6 +99,7 @@ export function DashboardHome({
 
         <button
           type="button"
+          data-testid="card-brainstorm"
           onClick={() => onNavigate('brainstorm')}
           className="group flex items-start gap-4 tl-card p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-tl-brand sm:col-span-2 lg:col-span-1"
         >

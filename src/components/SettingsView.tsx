@@ -70,6 +70,7 @@ export function SettingsView({
             </div>
             <input
               type="checkbox"
+              data-testid="setting-require-approval"
               checked={requireApproval}
               onChange={(e) => onRequireApprovalChange(e.target.checked)}
               className="h-4 w-4 rounded border-tl-gray-300 text-tl-cyan-500 focus:ring-tl-cyan-400"
@@ -84,6 +85,7 @@ export function SettingsView({
             </div>
             <input
               type="checkbox"
+              data-testid="setting-auto-save"
               checked={autoSaveDrafts}
               onChange={(e) => onAutoSaveChange(e.target.checked)}
               className="h-4 w-4 rounded border-tl-gray-300 text-tl-purple-500 focus:ring-tl-purple-400"
@@ -98,6 +100,7 @@ export function SettingsView({
             </div>
             <input
               type="checkbox"
+              data-testid="setting-show-prompts"
               checked={showPrompts}
               onChange={(e) => onShowPromptsChange(e.target.checked)}
               className="h-4 w-4 rounded border-tl-gray-300 text-tl-purple-500 focus:ring-tl-purple-400"
@@ -131,6 +134,7 @@ export function SettingsView({
                 <button
                   key={option.value}
                   type="button"
+                  data-testid={`theme-${option.value}`}
                   onClick={() => setTheme(option.value)}
                   className={`flex flex-col items-center gap-1.5 rounded-xl border px-3 py-3 text-xs font-medium transition-all ${
                     isActive

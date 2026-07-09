@@ -16,8 +16,12 @@
     "preview": "vite preview",
     "test": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
+    "test:integration:ci": "vitest run --config vitest.integration.config.ts",
     "test:integration:vercel": "cross-env TEST_BASE_URL=https://think-loop-brown.vercel.app vitest run tests/integration",
-    "test:all": "vitest run"
+    "test:e2e": "playwright test",
+    "test:e2e:openrouter": "playwright test tests/e2e/ai-openrouter",
+    "test:all": "vitest run",
+    "test:full": "npm test && npm run test:integration:ci && npm run test:e2e"
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",
@@ -33,6 +37,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/vite": "^4.3.1",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",

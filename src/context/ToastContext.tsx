@@ -41,10 +41,11 @@ const ICONS = {
 
 const STYLES = {
   success:
-    'border-tl-cyan-200/80 bg-tl-cyan-50/95 text-tl-cyan-800 dark:border-tl-cyan-500/30 dark:bg-tl-cyan-950/90 dark:text-tl-cyan-100',
+    'border-tl-cyan-200/80 bg-tl-cyan-50/95 text-tl-gray-900 dark:border-tl-cyan-500/30 dark:bg-tl-cyan-50/40',
   error:
     'border-red-200/80 bg-red-50/95 text-red-800 dark:border-red-500/30 dark:bg-red-950/90 dark:text-red-100',
-  info: 'border-tl-purple-200/80 bg-tl-purple-50/95 text-tl-purple-800 dark:border-tl-purple-500/30 dark:bg-tl-purple-950/90 dark:text-tl-purple-100',
+  info:
+    'border-tl-purple-200/80 bg-tl-purple-50/95 text-tl-gray-900 dark:border-tl-purple-500/30 dark:bg-tl-purple-50/30',
 } as const
 
 const ICON_STYLES = {
@@ -59,13 +60,15 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
   return (
     <div
       role="status"
+      data-testid={`toast-${toast.type}`}
       aria-live="polite"
       className={`toast-enter glass-panel flex items-start gap-3 rounded-xl border px-4 py-3 shadow-lg ${STYLES[toast.type]}`}
     >
       <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${ICON_STYLES[toast.type]}`} aria-hidden />
-      <p className="min-w-0 flex-1 text-sm leading-snug">{toast.message}</p>
+      <p className="min-w-0 flex-1 text-sm leading-snug text-inherit">{toast.message}</p>
       <button
         type="button"
+        data-testid="toast-dismiss"
         onClick={() => onDismiss(toast.id)}
         className="shrink-0 rounded-md p-0.5 opacity-60 transition-opacity hover:opacity-100"
         aria-label="Dismiss notification"

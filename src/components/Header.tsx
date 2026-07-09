@@ -23,6 +23,7 @@ export function Header({ user, onSearchFocus }: HeaderProps) {
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-tl-gray-400" />
         <input
           type="search"
+          data-testid="header-search"
           placeholder="Search ideas, drafts, summaries…"
           onFocus={onSearchFocus}
           className="tl-input w-full py-2.5 pl-10 pr-16 text-sm"
@@ -40,6 +41,7 @@ export function Header({ user, onSearchFocus }: HeaderProps) {
 
         <button
           type="button"
+          data-testid="header-theme-toggle"
           onClick={toggleTheme}
           className="rounded-xl p-2.5 text-tl-gray-500 transition-all hover:bg-tl-gray-100 hover:text-tl-gray-800 dark:hover:bg-tl-gray-200/10"
           aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -49,6 +51,7 @@ export function Header({ user, onSearchFocus }: HeaderProps) {
 
         <button
           type="button"
+          data-testid="header-notifications"
           className="relative rounded-xl p-2.5 text-tl-gray-500 transition-all hover:bg-tl-gray-100 hover:text-tl-gray-800 dark:hover:bg-tl-gray-200/10"
           aria-label="Notifications"
         >
@@ -58,6 +61,7 @@ export function Header({ user, onSearchFocus }: HeaderProps) {
 
         <button
           type="button"
+          data-testid="header-user"
           className="flex items-center gap-2 rounded-xl border border-tl-gray-200/80 bg-surface/60 px-2 py-1.5 transition-all hover:border-tl-purple-200/60 hover:bg-surface-raised"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tl-brand shadow-tl-brand text-xs font-semibold text-white">

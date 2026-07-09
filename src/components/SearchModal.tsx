@@ -79,6 +79,7 @@ export function SearchModal({ open, onClose, onNavigate }: SearchModalProps) {
           <Search className="h-4 w-4 text-tl-gray-400" />
           <input
             ref={inputRef}
+            data-testid="search-input"
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -111,6 +112,7 @@ export function SearchModal({ open, onClose, onNavigate }: SearchModalProps) {
             <button
               key={`${item.type}-${item.id}`}
               type="button"
+              data-testid={`search-result-${item.type}`}
               onClick={() => onNavigate?.(item.section)}
               className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-tl-gray-100/80 dark:hover:bg-tl-gray-200/10"
             >

@@ -10,7 +10,7 @@ export function SectionPlaceholder({ title, description }: SectionPlaceholderPro
         <h1 className="text-2xl font-bold text-tl-gray-900">{title}</h1>
         <p className="mt-1 text-sm text-tl-gray-500">{description}</p>
       </div>
-      <div className="flex h-64 items-center justify-center rounded-2xl border border-dashed border-tl-gray-200 bg-surface">
+      <div className="flex h-64 items-center justify-center rounded-2xl border border-dashed border-tl-gray-200 bg-surface" data-testid="section-placeholder">
         <p className="text-sm text-tl-gray-400">Coming soon</p>
       </div>
     </div>

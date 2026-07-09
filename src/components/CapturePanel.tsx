@@ -54,6 +54,7 @@ export function CapturePanel({
               </p>
               <button
                 type="button"
+                data-testid="next-prompt"
                 onClick={onNextPrompt}
                 className="flex shrink-0 items-center gap-1 text-xs font-medium text-tl-purple-500 hover:text-tl-purple-600"
               >
@@ -69,6 +70,7 @@ export function CapturePanel({
 
         <textarea
           ref={textareaRef}
+          data-testid="thought-input"
           value={input}
           onChange={(e) => onInputChange(e.target.value)}
           placeholder="Type anything — fragments, questions, half-formed ideas, frustrations…"
@@ -79,6 +81,7 @@ export function CapturePanel({
           <div className="flex items-center gap-2">
             <button
               type="button"
+              data-testid="voice-btn"
               className="flex items-center gap-1.5 rounded-lg border border-tl-gray-200 px-3 py-2 text-xs font-medium text-tl-gray-600 transition-colors hover:bg-tl-gray-50"
             >
               <Mic className="h-3.5 w-3.5" />
@@ -88,6 +91,7 @@ export function CapturePanel({
           </div>
           <button
             type="button"
+            data-testid="add-thought"
             onClick={onAddThought}
             disabled={!input.trim()}
             className="flex items-center gap-1.5 rounded-xl bg-tl-brand bg-tl-brand-hover px-4 py-2 text-sm font-medium text-white transition-colors  disabled:cursor-not-allowed disabled:opacity-50"

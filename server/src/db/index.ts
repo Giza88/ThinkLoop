@@ -22,3 +22,11 @@ export function getDb() {
   }
   return db
 }
+
+export function closeDb() {
+  if (client) {
+    client.close()
+    client = null
+    db = null
+  }
+}

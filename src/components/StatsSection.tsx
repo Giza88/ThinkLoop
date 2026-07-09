@@ -39,6 +39,7 @@ export function StatsSection({ ideas = [], stats }: StatsSectionProps) {
               </div>
               <button
                 type="button"
+                data-testid="add-idea-btn"
                 className="flex items-center gap-1.5 rounded-lg border border-tl-gray-200 px-3 py-1.5 text-xs font-medium text-tl-gray-600 transition-colors hover:bg-tl-gray-50"
               >
                 <Plus className="h-3.5 w-3.5" />

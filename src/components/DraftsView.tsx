@@ -30,6 +30,7 @@ export function DraftsView({ drafts, onOpen, onDelete }: DraftsViewProps) {
           {drafts.map((draft) => (
             <article
               key={draft.id}
+              data-testid={`draft-card-${draft.id}`}
               className="group tl-card p-5 transition-colors hover:border-tl-purple-200"
             >
               <div className="flex items-start justify-between gap-3">
@@ -48,6 +49,7 @@ export function DraftsView({ drafts, onOpen, onDelete }: DraftsViewProps) {
                 </button>
                 <button
                   type="button"
+                  data-testid={`delete-draft-${draft.id}`}
                   onClick={() => onDelete(draft.id)}
                   className="rounded-lg p-2 text-tl-gray-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
                   aria-label={`Delete ${draft.title}`}
