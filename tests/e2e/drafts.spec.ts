@@ -1,18 +1,16 @@
 import { expect, test } from '@playwright/test'
-import { resetWorkspace } from './helpers/api.js'
-import { navigateTo, waitForApp } from './helpers/app.js'
+import { navigateTo, resetAndReload } from './helpers/app.js'
 
 test.describe('drafts', () => {
   test.beforeEach(async ({ page }) => {
-    await resetWorkspace()
-    await waitForApp(page)
+    await resetAndReload(page)
     await navigateTo(page, 'workspace')
 
     await page.getByTestId('thought-input').fill('Draft view test thought')
     await page.getByTestId('add-thought').click()
     await page.getByTestId('organize-btn').click()
     await page.getByTestId('approve-btn').click({ timeout: 30_000 })
-    await expect(page.getByTestId('toast-success')).toBeVisible()
+    await expect(page.getByTestId('toast-success').last()).toBeVisible({ timeout: 10_000 })
 
     await navigateTo(page, 'drafts')
   })

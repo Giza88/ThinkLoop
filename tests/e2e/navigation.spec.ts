@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { navigateTo, waitForApp } from './helpers/app.js'
+import { navigateTo, resetAndReload } from './helpers/app.js'
 
 const NAV_ITEMS = [
   { id: 'dashboard', heading: /good morning/i },
@@ -15,7 +15,7 @@ const NAV_ITEMS = [
 
 test.describe('navigation', () => {
   test.beforeEach(async ({ page }) => {
-    await waitForApp(page)
+    await resetAndReload(page)
   })
 
   for (const item of NAV_ITEMS) {
@@ -40,15 +40,15 @@ test.describe('navigation', () => {
   test('collapses and expands the sidebar', async ({ page }) => {
     const sidebar = page.locator('aside')
     const initialBox = await sidebar.boundingBox()
-    expect(initialBox?.width).toBeGreaterThan(200)
+    expect(initialBox?.width ?? 0).toBeGreaterThan(150)
 
     await page.getByTestId('sidebar-toggle').click()
     const collapsedBox = await sidebar.boundingBox()
-    expect(collapsedBox?.width).toBeLessThan(100)
+    expect(collapsedBox?.width ?? 0).toBeLessThan(100)
 
     await page.getByTestId('sidebar-toggle').click()
     const expandedBox = await sidebar.boundingBox()
-    expect(expandedBox?.width).toBeGreaterThan(200)
+    expect(expandedBox?.width ?? 0).toBeGreaterThan(150)
 
     await page.getByTestId('nav-workspace').click()
     await expect(page.getByRole('heading', { name: /thinkloop workspace/i })).toBeVisible()

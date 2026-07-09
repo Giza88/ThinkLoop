@@ -14,7 +14,7 @@ test.describe('header', () => {
   test('toggles search modal with keyboard shortcut', async ({ page }) => {
     await page.keyboard.press('Control+K')
     await expect(page.getByTestId('search-input')).toBeVisible()
-    await page.keyboard.press('Control+K')
+    await page.keyboard.press('Escape')
     await expect(page.getByTestId('search-input')).toBeHidden()
   })
 

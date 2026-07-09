@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test'
 import { getSettings } from './helpers/api.js'
-import { navigateTo, waitForApp } from './helpers/app.js'
+import { navigateTo, resetAndReload, waitForApp } from './helpers/app.js'
 
 test.describe('settings', () => {
   test.beforeEach(async ({ page }) => {
-    await waitForApp(page)
+    await resetAndReload(page)
     await navigateTo(page, 'settings')
   })
 
@@ -54,10 +54,7 @@ test.describe('settings', () => {
 
   test('connect modal backdrop, close, and continue flow', async ({ page }) => {
     const githubButton = page.getByTestId('integration-github').first()
-    if ((await githubButton.textContent())?.includes('Disconnect')) {
-      await githubButton.click()
-      await expect(page.getByTestId('toast-success')).toBeVisible()
-    }
+    await expect(githubButton).toContainText('Sign in to connect')
 
     await githubButton.click()
     await expect(page.getByTestId('connect-modal')).toBeVisible()
@@ -71,20 +68,17 @@ test.describe('settings', () => {
 
     await githubButton.click()
     await page.getByTestId('connect-continue').click()
-    await expect(page.getByTestId('toast-success')).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByTestId('toast-success').last()).toBeVisible({ timeout: 10_000 })
   })
 
   test('microsoft connect requires email', async ({ page }) => {
     const msButton = page.getByTestId('integration-microsoft').first()
-    if ((await msButton.textContent())?.includes('Disconnect')) {
-      await msButton.click()
-      await expect(page.getByTestId('toast-success')).toBeVisible()
-    }
+    await expect(msButton).toContainText('Sign in to connect')
 
     await msButton.click()
     await expect(page.getByTestId('connect-email')).toBeVisible()
     await page.getByTestId('connect-email').fill('tester@example.com')
     await page.getByTestId('connect-continue').click()
-    await expect(page.getByTestId('toast-success')).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByTestId('toast-success').last()).toBeVisible({ timeout: 10_000 })
   })
 })

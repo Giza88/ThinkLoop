@@ -9,5 +9,10 @@ server/data/
 *.db-shm
 .DS_Store
 
+# Playwright (never commit local run output)
+test-results/
+playwright-report/
+blob-report/
+
 .vercel
 .env*

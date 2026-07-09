@@ -1,11 +1,10 @@
 import { expect, test } from '@playwright/test'
-import { getDrafts, resetWorkspace } from './helpers/api.js'
-import { navigateTo, waitForApp } from './helpers/app.js'
+import { getDrafts } from './helpers/api.js'
+import { navigateTo, resetAndReload } from './helpers/app.js'
 
 test.describe('workspace', () => {
   test.beforeEach(async ({ page }) => {
-    await resetWorkspace()
-    await waitForApp(page)
+    await resetAndReload(page)
     await navigateTo(page, 'workspace')
   })
 
@@ -52,7 +51,7 @@ test.describe('workspace', () => {
 
     await page.getByTestId('approve-btn').click()
     await expect(page.getByText('Approved — ready to export or send')).toBeVisible()
-    await expect(page.getByTestId('toast-success')).toBeVisible()
+    await expect(page.getByTestId('toast-success').last()).toBeVisible()
 
     const drafts = await getDrafts()
     expect(drafts.length).toBeGreaterThan(0)
@@ -89,7 +88,7 @@ test.describe('workspace', () => {
     await expect(page.getByTestId('copy-btn')).toBeVisible()
 
     await page.getByTestId('copy-btn').click()
-    await expect(page.getByTestId('toast-success')).toBeVisible()
+    await expect(page.getByTestId('toast-success').last()).toBeVisible()
 
     const clipboard = await page.evaluate(() => navigator.clipboard.readText())
     expect(clipboard.length).toBeGreaterThan(10)
@@ -105,6 +104,6 @@ test.describe('workspace', () => {
     await page.getByTestId('export-btn').click()
     const download = await downloadPromise
     expect(download.suggestedFilename()).toMatch(/\.md$/)
-    await expect(page.getByTestId('toast-success')).toBeVisible()
+    await expect(page.getByTestId('toast-success').last()).toBeVisible()
   })
 })

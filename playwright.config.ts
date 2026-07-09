@@ -4,6 +4,7 @@ import path from 'node:path'
 const testDbPath = path.join('server', 'data', 'test.db')
 const apiPort = process.env.E2E_API_PORT ?? '3999'
 const clientPort = process.env.E2E_CLIENT_PORT ?? '5999'
+const openRouterApiKey = process.env.OPENROUTER_API_KEY?.trim() ?? ''
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -28,10 +29,14 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `npx cross-env PORT=${apiPort} DB_PATH=${testDbPath} OPENROUTER_API_KEY= npm run dev:server`,
+      command: `npx cross-env PORT=${apiPort} DB_PATH=${testDbPath} npm run dev:server`,
       url: `http://localhost:${apiPort}/health`,
       reuseExistingServer: false,
       timeout: 120_000,
+      env: {
+        // Empty string forces rules-mode for default E2E; CI test-openrouter passes the secret here.
+        OPENROUTER_API_KEY: openRouterApiKey,
+      },
     },
     {
       command: `npx cross-env VITE_API_PORT=${apiPort} npm run dev:client -- --port ${clientPort}`,

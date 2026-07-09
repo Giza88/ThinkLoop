@@ -1,23 +1,19 @@
 import { expect, test } from '@playwright/test'
-import { navigateTo, waitForApp } from './helpers/app.js'
+import { navigateTo, resetAndReload } from './helpers/app.js'
 
 test.describe('toasts', () => {
   test('dismisses toast notification', async ({ page }) => {
-    await waitForApp(page)
+    await resetAndReload(page)
     await navigateTo(page, 'settings')
 
-    const msButton = page.getByTestId('integration-slack').first()
-    if ((await msButton.textContent())?.includes('Disconnect')) {
-      await msButton.click()
-      await page.getByTestId('toast-dismiss').click()
-      await expect(page.getByTestId('toast-success')).toHaveCount(0)
-    }
+    const slackButton = page.getByTestId('integration-slack').first()
+    await expect(slackButton).toContainText('Sign in to connect')
 
-    await msButton.click()
+    await slackButton.click()
     await page.getByTestId('connect-continue').click()
-    await expect(page.getByTestId('toast-success')).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByTestId('toast-success').last()).toBeVisible({ timeout: 10_000 })
 
-    await page.getByTestId('toast-dismiss').click()
+    await page.getByTestId('toast-dismiss').last().click()
     await expect(page.getByTestId('toast-success')).toHaveCount(0)
   })
 })

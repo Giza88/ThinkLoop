@@ -9,7 +9,7 @@ test.describe('email reply', () => {
 
   test('selects an email from the inbox', async ({ page }) => {
     await page.getByTestId('email-card-email-2').click()
-    await expect(page.getByText('Contract renewal — pricing discussion')).toBeVisible()
+    await expect(page.getByText('Contract renewal — pricing discussion').first()).toBeVisible()
   })
 
   test('analyzes email and shows questions', async ({ page }) => {
@@ -56,7 +56,7 @@ test.describe('email reply', () => {
     await page.getByTestId('draft-btn').click()
     await expect(page.getByTestId('approve-draft')).toBeVisible({ timeout: 30_000 })
     await page.getByTestId('approve-draft').click()
-    await expect(page.getByText('Approved — ready to send via Outlook')).toBeVisible()
+    await expect(page.getByText('Approved — ready to send via Outlook').first()).toBeVisible()
   })
 
   test('copies draft to clipboard', async ({ page, context }) => {

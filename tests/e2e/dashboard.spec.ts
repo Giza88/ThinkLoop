@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test'
-import { navigateTo, waitForApp } from './helpers/app.js'
+import { resetAndReload, navigateTo, waitForApp } from './helpers/app.js'
 
 const INTEGRATION_PROVIDER_IDS = ['microsoft', 'google', 'slack', 'github', 'linear', 'notion']
 
 test.describe('dashboard', () => {
   test.beforeEach(async ({ page }) => {
-    await waitForApp(page)
+    await resetAndReload(page)
     await navigateTo(page, 'dashboard')
   })
 
@@ -33,14 +33,8 @@ test.describe('dashboard', () => {
   for (const providerId of INTEGRATION_PROVIDER_IDS) {
     test(`integration connect opens modal for ${providerId}`, async ({ page }) => {
       const button = page.getByTestId(`integration-${providerId}`).first()
-      const label = await button.textContent()
-
-      if (label?.includes('Disconnect')) {
-        await button.click()
-        await expect(page.getByTestId('toast-success')).toBeVisible()
-        await page.getByTestId(`integration-${providerId}`).first().click()
-      }
-
+      await expect(button).toContainText('Sign in to connect')
+      await button.click()
       await expect(page.getByTestId('connect-modal')).toBeVisible()
       await page.getByLabel('Close modal').click()
       await expect(page.getByTestId('connect-modal')).toBeHidden()
@@ -50,20 +44,13 @@ test.describe('dashboard', () => {
   test('integration disconnect removes connected state', async ({ page }) => {
     const slackButton = page.getByTestId('integration-slack').first()
 
-    if ((await slackButton.textContent())?.includes('Disconnect')) {
-      await slackButton.click()
-      await expect(page.getByTestId('toast-success')).toBeVisible()
-    }
-
     await slackButton.click()
     await page.getByTestId('connect-continue').click()
-    await expect(page.getByTestId('toast-success')).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByTestId('toast-success').last()).toBeVisible({ timeout: 10_000 })
+    await expect(slackButton).toContainText('Disconnect')
 
-    const connectedButton = page.getByTestId('integration-slack').first()
-    await expect(connectedButton).toContainText('Disconnect')
-
-    await connectedButton.click()
-    await expect(page.getByTestId('toast-success')).toBeVisible()
-    await expect(connectedButton).toContainText('Sign in to connect')
+    await slackButton.click()
+    await expect(page.getByTestId('toast-success').last()).toBeVisible({ timeout: 10_000 })
+    await expect(slackButton).toContainText('Sign in to connect')
   })
 })
