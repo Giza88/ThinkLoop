@@ -48,14 +48,21 @@ export async function teardown(): Promise<void> {
   serverProcess = null
 
   await new Promise<void>((resolve) => {
-    if (proc.killed) {
+    // exitCode/signalCode are set only after the process actually exits.
+    // proc.killed is true as soon as a signal is sent, so it must not gate SIGKILL.
+    if (proc.exitCode !== null || proc.signalCode !== null) {
       resolve()
       return
     }
-    proc.once('exit', () => resolve())
+
+    let exited = false
+    proc.once('exit', () => {
+      exited = true
+      resolve()
+    })
     proc.kill()
     setTimeout(() => {
-      if (!proc.killed) {
+      if (!exited) {
         proc.kill('SIGKILL')
       }
       resolve()
