@@ -2,6 +2,8 @@ import { defineConfig, devices } from '@playwright/test'
 import path from 'node:path'
 
 const testDbPath = path.join('server', 'data', 'test.db')
+const apiPort = process.env.E2E_API_PORT ?? '3999'
+const clientPort = process.env.E2E_CLIENT_PORT ?? '5999'
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -12,7 +14,7 @@ export default defineConfig({
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
   globalSetup: './tests/playwright-global-setup.ts',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: `http://localhost:${clientPort}`,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -26,14 +28,14 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `npx cross-env DB_PATH=${testDbPath} OPENROUTER_API_KEY= npm run dev:server`,
-      url: 'http://localhost:3001/health',
+      command: `npx cross-env PORT=${apiPort} DB_PATH=${testDbPath} OPENROUTER_API_KEY= npm run dev:server`,
+      url: `http://localhost:${apiPort}/health`,
       reuseExistingServer: false,
       timeout: 120_000,
     },
     {
-      command: 'npm run dev:client',
-      url: 'http://localhost:5173',
+      command: `npx cross-env VITE_API_PORT=${apiPort} npm run dev:client -- --port ${clientPort}`,
+      url: `http://localhost:${clientPort}`,
       reuseExistingServer: false,
       timeout: 120_000,
     },

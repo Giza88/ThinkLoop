@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: drafts.spec.ts >> drafts >> deletes a draft
-- Location: tests\e2e\drafts.spec.ts:28:3
+- Name: drafts.spec.ts >> drafts >> opens a draft in workspace
+- Location: tests\e2e\drafts.spec.ts:20:3
 
 # Error details
 
@@ -159,7 +159,7 @@ Call log:
                   - heading "Problem Statement" [level=4] [ref=e199]
                   - paragraph [ref=e200]: • Draft view test thought
                 - generic [ref=e201]:
-                  - paragraph [ref=e202]: Proposed 12:26:40 PM · Approved by you
+                  - paragraph [ref=e202]: Proposed 12:26:01 PM · Approved by you
                   - button "Re-organize" [ref=e203]:
                     - img [ref=e204]
                     - text: Re-organize

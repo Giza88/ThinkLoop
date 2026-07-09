@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:3001'
+const API_BASE = `http://localhost:${process.env.E2E_API_PORT ?? '3999'}`
 
 export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
   const url = `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`

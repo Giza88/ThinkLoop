@@ -14,23 +14,21 @@
 ```
 Error: expect(locator).toBeVisible() failed
 
-Locator: getByTestId('connect-modal')
+Locator: getByTestId('toast-success')
 Expected: visible
 Timeout: 5000ms
 Error: element(s) not found
 
 Call log:
   - Expect "toBeVisible" with timeout 5000ms
-  - waiting for getByTestId('connect-modal')
+  - waiting for getByTestId('toast-success')
 
 ```
 
 ```yaml
 - complementary:
   - img "ThinkLoop"
-  - paragraph: AI Work Assistant
   - navigation:
-    - paragraph: Work
     - list:
       - listitem:
         - button "Dashboard"
@@ -40,13 +38,11 @@ Call log:
         - button "Email Reply"
       - listitem:
         - button "Brainstorm"
-    - paragraph: Library
     - list:
       - listitem:
-        - button "Drafts 3"
+        - button "4"
       - listitem:
         - button "History"
-    - paragraph: More
     - list:
       - listitem:
         - button "Summaries"
@@ -55,11 +51,11 @@ Call log:
       - listitem:
         - button "Team"
   - button "Settings"
-  - button "Collapse sidebar"
+  - button "Expand sidebar"
 - banner:
   - searchbox "Search ideas, drafts, summaries…"
   - text: ⌘K You approve · Agent proposes
-  - button "Switch to light mode"
+  - button "Switch to dark mode"
   - button "Notifications"
   - button "AM Alex Morgan"
 - main:
@@ -123,8 +119,9 @@ Call log:
   - button "Disconnect"
   - text: GH
   - paragraph: GitHub
+  - text: Connected
   - paragraph: Repos, PRs, issues, and commits
-  - button "Sign in to connect"
+  - button "Disconnect"
   - text: Li
   - paragraph: Linear
   - paragraph: Issues, cycles, and project updates
@@ -133,7 +130,7 @@ Call log:
   - paragraph: Notion
   - paragraph: Pages, databases, and wikis
   - button "Sign in to connect"
-  - text: 2 tools connected — agent can read context from these sources. All outbound actions still require your approval.
+  - text: 3 tools connected — agent can read context from these sources. All outbound actions still require your approval.
   - button "Start a new session Capture thoughts, get an AI proposal, approve before export — the full human loop. Open workspace":
     - paragraph: Start a new session
     - paragraph: Capture thoughts, get an AI proposal, approve before export — the full human loop.
@@ -146,13 +143,13 @@ Call log:
     - paragraph: Brainstorm ideas
     - paragraph: Collect product ideas, tag them, and pick one to develop in the workspace.
     - text: View board
-  - paragraph: "10"
+  - paragraph: "15"
   - paragraph: Outputs Generated
-  - paragraph: +10 this week
+  - paragraph: +15 this week
   - paragraph: 100%
   - paragraph: Approval Rate
   - paragraph: Healthy approved vs rejected
-  - paragraph: "9"
+  - paragraph: "11"
   - paragraph: Drafts Saved
   - paragraph: total saves
   - paragraph: "0"
@@ -161,6 +158,9 @@ Call log:
   - heading "AI Outputs This Week" [level=3]
   - paragraph: Recent structured documents
   - button "Add Idea"
+  - heading "E2E Idea 1783556645893" [level=4]
+  - text: UX
+  - paragraph: End-to-end brainstorm test idea.
   - heading "E2E Idea 1783556012465" [level=4]
   - text: UX
   - paragraph: End-to-end brainstorm test idea.
@@ -170,12 +170,12 @@ Call log:
   - heading "Weekly digest newsletter" [level=4]
   - text: Marketing Automation
   - paragraph: Auto-summarize team activity from Slack, Linear, and GitHub into a readable Friday newsletter.
-  - heading "AI feedback on PRDs" [level=4]
-  - text: PM Engineering
-  - paragraph: Let AI flag gaps in product requirement docs before they go to engineering — catch ambiguities early.
   - heading "Weekly Activity" [level=3]
   - paragraph: AI outputs by day
   - text: Sun Mon Tue Wed Thu Fri Sat
+- status:
+  - paragraph: Bad Request
+  - button "Dismiss notification"
 ```
 
 # Test source
@@ -220,12 +220,12 @@ Call log:
   37 | 
   38 |       if (label?.includes('Disconnect')) {
   39 |         await button.click()
-  40 |         await expect(page.getByTestId('toast-success')).toBeVisible()
+> 40 |         await expect(page.getByTestId('toast-success')).toBeVisible()
+     |                                                         ^ Error: expect(locator).toBeVisible() failed
   41 |         await page.getByTestId(`integration-${providerId}`).first().click()
   42 |       }
   43 | 
-> 44 |       await expect(page.getByTestId('connect-modal')).toBeVisible()
-     |                                                       ^ Error: expect(locator).toBeVisible() failed
+  44 |       await expect(page.getByTestId('connect-modal')).toBeVisible()
   45 |       await page.getByLabel('Close modal').click()
   46 |       await expect(page.getByTestId('connect-modal')).toBeHidden()
   47 |     })
